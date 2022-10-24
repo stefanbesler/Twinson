@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="JsonAssignment" Id="{3cc9a92c-803a-44e9-954a-8c13d51b3fdf}">
+    <Declaration><![CDATA[TYPE JsonAssignment :
+STRUCT
+  key : STRING(ParameterList.MaxJsonKeyLength);
+  hash : LINT;
+  startPtr : POINTER TO BYTE;
+  endPtr : POINTER TO BYTE;
+  valueType : JsonElementType;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

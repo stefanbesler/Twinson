@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="JsonElementType" Id="{3d12cef6-ca69-4d7e-8138-58dc5e3a7e28}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+TYPE JsonElementType :
+(
+  Undefined := 0,
+  Strng,
+  Number,
+  Object,
+  Arry,
+  Boolean,
+  Null
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

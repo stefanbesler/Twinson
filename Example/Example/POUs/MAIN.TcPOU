@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MAIN" Id="{d4ae1a7c-d8d0-4bc2-9c7a-c06779a4124b}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+  json : Twinson.JsonDecoder;
+  parse : BOOL := TRUE;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF parse
+THEN
+  parse := FALSE;
+  json.DecodeText('{ "integer1": 5, "string1": "la", "null1": null, "object1" : { "subint1":5, "substring1":"lala", "subfloat1":5.44 }, "string2": "asdf"  }');  
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

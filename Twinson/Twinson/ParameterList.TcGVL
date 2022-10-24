@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="ParameterList" Id="{64e570dd-c626-47da-b2c7-1e2c8664fa9d}" ParameterList="True">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL CONSTANT
+  MaxJsonLength : INT := 2055;
+  MaxJsonKeyLength : INT := 31;
+  MaxJsonValueLength : INT := 255;
+  MaxJsonAssignments : INT := 63;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>
