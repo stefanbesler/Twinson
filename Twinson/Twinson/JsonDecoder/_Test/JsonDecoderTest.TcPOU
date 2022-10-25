@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="JsonDecoderTest" Id="{f5f16609-da6a-435e-8d26-a4efca0c555c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK JsonDecoderTest EXTENDS JsonDecoder IMPLEMENTS IUnitTest]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="AddArrayIndexToKeyTest" Id="{997eece4-29aa-4921-82a5-00c9de6877a1}">
+      <Declaration><![CDATA[METHOD PROTECTED AddArrayIndexToKeyTest
+VAR_INPUT
+  assertions : IAssertions;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_key := 'ary['; _keyPtr := ADR(_key) + 4;
+AddArrayIndexToKey(0);
+_keyPtr^ := 0;
+assertions.EqualsString(expected := 'ary[0]', actual := _key, message:='Index 0 is correctly converted to an array index key');
+
+_key := 'ary['; _keyPtr := ADR(_key) + 4;
+AddArrayIndexToKey(1);
+_keyPtr^ := 0;
+assertions.EqualsString(expected := 'ary[1]', actual := _key, message:='Index 1 is correctly converted to an array index key');
+
+_key := 'ary['; _keyPtr := ADR(_key) + 4;
+AddArrayIndexToKey(9);
+_keyPtr^ := 0;
+assertions.EqualsString(expected := 'ary[9]', actual := _key, message:='Index 9 is correctly converted to an array index key');
+
+_key := 'ary['; _keyPtr := ADR(_key) + 4;
+AddArrayIndexToKey(10);
+_keyPtr^ := 0;
+assertions.EqualsString(expected := 'ary[10]', actual := _key, message:='Index 10 is correctly converted to an array index key');
+
+_key := 'ary['; _keyPtr := ADR(_key) + 4;
+AddArrayIndexToKey(55);
+_keyPtr^ := 0;
+assertions.EqualsString(expected := 'ary[55]', actual := _key, message:='Index 55 is correctly converted to an array index key');]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

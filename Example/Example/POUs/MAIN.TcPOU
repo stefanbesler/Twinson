@@ -5,9 +5,6 @@
 VAR
   json : Twinson.JsonDecoder;
   parse : BOOL := TRUE;
-  
-  jsonTest : Twinson.JsonDecoderTest;  
-  a : Assertions;
 END_VAR
 ]]></Declaration>
     <Implementation>

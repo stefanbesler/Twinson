@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <Itf Name="IUnittest" Id="{192ca569-9db8-4106-9fd8-0ed7a43c0241}">
+    <Declaration><![CDATA[/// see [Zeugwerk Unittest](https://doc.zeugwerk.dev/reference/ZCore/UnitTest/IUnitTest.html)
+INTERFACE IUnittest
+]]></Declaration>
+  </Itf>
+</TcPlcObject>
