@@ -18,8 +18,9 @@
     <Company>Stefan Besler</Company>
     <Released>false</Released>
     <Title>Twinson</Title>
-    <ProjectVersion>0.0.0.0</ProjectVersion>
+    <ProjectVersion>0.1.0.0</ProjectVersion>
     <DefaultNamespace>Twinson</DefaultNamespace>
+    <CompilerDefines></CompilerDefines>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="JsonDecoder" />

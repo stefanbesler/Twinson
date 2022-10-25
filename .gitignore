@@ -1,4 +1,5 @@
 .Zeugwerk/libraries
+test
 # TwinCAT files
 *.tpy
 *.tclrs
