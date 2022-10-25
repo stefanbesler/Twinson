@@ -6,7 +6,7 @@
       <ST><![CDATA[]]></ST>
     </Implementation>
     <Method Name="AddArrayIndexToKeyTest" Id="{997eece4-29aa-4921-82a5-00c9de6877a1}">
-      <Declaration><![CDATA[METHOD PROTECTED AddArrayIndexToKeyTest
+      <Declaration><![CDATA[METHOD AddArrayIndexToKeyTest
 VAR_INPUT
   assertions : IAssertions;
 END_VAR]]></Declaration>
