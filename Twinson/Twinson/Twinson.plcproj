@@ -34,6 +34,9 @@
     <Compile Include="JsonDecoder\JsonElementType.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsonDecoder\_Test\JsonDecoderTest.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ParameterList.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>

@@ -5,13 +5,16 @@
 VAR
   json : Twinson.JsonDecoder;
   parse : BOOL := TRUE;
+  
+  jsonTest : Twinson.JsonDecoderTest;  
+  a : Assertions;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[IF parse
 THEN
   parse := FALSE;
-  json.DecodeText('{ "integer1": 5, "string1": "la", "null1": null, "object1" : { "subint1":5, "substring1":"lala", "subfloat1":5.44 }, "string2": "asdf"  }');  
+  json.DecodeText('{ "integer1": 5, "string1": "la", "null1": null, "mixed_nested_array": [{"name": "Nested object"}, 4, true, [null, null, 5] ], "object1" : { "subint1":5, "substring1":"lala", "subfloat1":5.44 }, "string2": "asdf", "array2" : [5,4]  }');  
 END_IF]]></ST>
     </Implementation>
   </POU>
