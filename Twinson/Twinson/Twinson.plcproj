@@ -23,6 +23,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="JsonDecoder" />
+    <Folder Include="JsonDecoder\_Test" />
+    <Folder Include="UnitTest" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="JsonDecoder\JsonAssignment.TcDUT">
@@ -40,6 +42,12 @@
     <Compile Include="ParameterList.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="UnitTest\IAssertions.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UnitTest\IUnittest.TcIO">
+      <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ProjectExtensions>

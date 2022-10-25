@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <Itf Name="IAssertions" Id="{b7bd617e-1899-0a44-3dba-1623419f0ed1}">
+    <Declaration><![CDATA[/// see [Zeugwerk Unittest](https://doc.zeugwerk.dev/reference/ZCore/UnitTest/IAssertions.html)
+INTERFACE IAssertions
+]]></Declaration>
+    <Method Name="EqualsString" Id="{f86d01c2-b6f9-3732-161c-86d66f2fb5fc}">
+      <Declaration><![CDATA[/// Asserts that two STRINGs are equal. If they are not, an assertion error is created.
+METHOD PUBLIC EqualsString
+VAR_INPUT
+  expected : STRING(255); //< STRING expected value
+  actual : STRING(255); //< STRING actual value
+  message : STRING(255); // The identifying message for the assertion error
+END_VAR]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>
