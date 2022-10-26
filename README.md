@@ -3,10 +3,14 @@ Simple and lightweight JSON decoder for TwinCAT and CODESYS.
 
 ## State of the implementation
 
-- [x] POC
-- [x] CI
-- [x] Basic Parser (No arrays)
-- [ ] Full Parser
+- [x] Continuous integration
+- [x] Parser
+  - [x] Strings
+  - [x] Numbers
+  - [x] Boolean
+  - [x] Null
+  - [x] Objects (including nested objects)
+  - [x] Arrays (including mixed array and nested arrays)
 - [ ] Hash calculator for fast element access
 - [ ] Basic element access
 - [ ] Monadic element access
