@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <Itf Name="IJsonElement" Id="{93e3d280-47b3-44b5-a43f-0cc3ab15a31e}">
+    <Declaration><![CDATA[INTERFACE IJsonElement
+]]></Declaration>
+    <Method Name="AsString" Id="{3f19f8f3-a437-4717-bde1-153fd3a7dfd7}">
+      <Declaration><![CDATA[METHOD AsString : STRING]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

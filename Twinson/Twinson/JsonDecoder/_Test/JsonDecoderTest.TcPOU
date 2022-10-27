@@ -11,30 +11,30 @@ VAR_INPUT
   assertions : IAssertions;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_key := 'ary['; _keyPtr := ADR(_key) + 4;
+        <ST><![CDATA[_path := 'ary['; _pathPtr := ADR(_path) + 4;
 AddArrayIndexToKey(0);
-_keyPtr^ := 0;
-assertions.EqualsString(expected := 'ary[0]', actual := _key, message:='Index 0 is correctly converted to an array index key');
+_pathPtr^ := 0;
+assertions.EqualsString(expected := 'ary[0]', actual := _path, message:='Index 0 is correctly converted to an array index key');
 
-_key := 'ary['; _keyPtr := ADR(_key) + 4;
+_path := 'ary['; _pathPtr := ADR(_path) + 4;
 AddArrayIndexToKey(1);
-_keyPtr^ := 0;
-assertions.EqualsString(expected := 'ary[1]', actual := _key, message:='Index 1 is correctly converted to an array index key');
+_pathPtr^ := 0;
+assertions.EqualsString(expected := 'ary[1]', actual := _path, message:='Index 1 is correctly converted to an array index key');
 
-_key := 'ary['; _keyPtr := ADR(_key) + 4;
+_path := 'ary['; _pathPtr := ADR(_path) + 4;
 AddArrayIndexToKey(9);
-_keyPtr^ := 0;
-assertions.EqualsString(expected := 'ary[9]', actual := _key, message:='Index 9 is correctly converted to an array index key');
+_pathPtr^ := 0;
+assertions.EqualsString(expected := 'ary[9]', actual := _path, message:='Index 9 is correctly converted to an array index key');
 
-_key := 'ary['; _keyPtr := ADR(_key) + 4;
+_path := 'ary['; _pathPtr := ADR(_path) + 4;
 AddArrayIndexToKey(10);
-_keyPtr^ := 0;
-assertions.EqualsString(expected := 'ary[10]', actual := _key, message:='Index 10 is correctly converted to an array index key');
+_pathPtr^ := 0;
+assertions.EqualsString(expected := 'ary[10]', actual := _path, message:='Index 10 is correctly converted to an array index key');
 
-_key := 'ary['; _keyPtr := ADR(_key) + 4;
+_path := 'ary['; _pathPtr := ADR(_path) + 4;
 AddArrayIndexToKey(55);
-_keyPtr^ := 0;
-assertions.EqualsString(expected := 'ary[55]', actual := _key, message:='Index 55 is correctly converted to an array index key');]]></ST>
+_pathPtr^ := 0;
+assertions.EqualsString(expected := 'ary[55]', actual := _path, message:='Index 55 is correctly converted to an array index key');]]></ST>
       </Implementation>
     </Method>
   </POU>

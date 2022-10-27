@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="JsonElement" Id="{a9d9bc4c-ecde-4f16-8328-473205f03d0b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK JsonElement IMPLEMENTS IJsonElement
+VAR_INPUT
+  Path : STRING(ParameterList.MaxJsonKeyLength);
+  Hash : LINT;
+  StartPtr : POINTER TO BYTE;
+  EndPtr : POINTER TO BYTE;
+  ValueType : JsonElementType;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="AsString" Id="{d52cb4e5-fb37-473e-ad74-833b38e32217}">
+      <Declaration><![CDATA[METHOD AsString : STRING
+VAR
+  it : POINTER TO BYTE;
+  retrn : POINTER TO BYTE;  
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[it := StartPtr;
+retrn := ADR(AsString);
+WHILE it <> EndPtr
+DO
+  retrn^ := it^;
+  retrn := retrn + 1;
+  it := it + 1;
+END_WHILE
+
+retrn^ := 0;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

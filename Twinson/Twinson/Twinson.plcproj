@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <FileVersion>1.0.0.0</FileVersion>
@@ -20,7 +21,8 @@
     <Title>Twinson</Title>
     <ProjectVersion>0.1.0.0</ProjectVersion>
     <DefaultNamespace>Twinson</DefaultNamespace>
-    <CompilerDefines></CompilerDefines>
+    <CompilerDefines>
+    </CompilerDefines>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="JsonDecoder" />
@@ -28,10 +30,13 @@
     <Folder Include="UnitTest" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JsonDecoder\JsonAssignment.TcDUT">
+    <Compile Include="JsonDecoder\IJsonElement.TcIO">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsonDecoder\JsonDecoder.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="JsonDecoder\JsonElement.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JsonDecoder\JsonElementType.TcDUT">
@@ -50,6 +55,11 @@
     <Compile Include="UnitTest\IUnittest.TcIO">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Twinson.tmc">
+      <SubType>Content</SubType>
+    </None>
   </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>

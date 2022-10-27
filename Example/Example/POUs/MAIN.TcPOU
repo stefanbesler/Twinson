@@ -5,13 +5,51 @@
 VAR
   json : Twinson.JsonDecoder;
   parse : BOOL := TRUE;
+  evaluate : BOOL := FALSE;
+  
+  integer1 : STRING;
+  string1 : STRING;
+  null1 : STRING;
+  mixedNestedArray_0_name : STRING;
+  mixedNestedArray_1 : STRING;
+  mixedNestedArray_2 : STRING;
+  mixedNestedArray_3_0 : STRING;
+  mixedNestedArray_3_1 : STRING;
+  mixedNestedArray_3_2 : STRING;
+  object1_subint1 : STRING;
+  object1_substring1 : STRING;
+  object1_subfloat1 : STRING;
+  string2 : STRING;
+  array2_0 : STRING;
+  array2_1 : STRING;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[IF parse
 THEN
   parse := FALSE;
-  json.DecodeText('{ "integer1": 5, "string1": "la", "null1": null, "mixed_nested_array": [{"name": "Nested object"}, 4, true, [null, null, 5] ], "object1" : { "subint1":5, "substring1":"lala", "subfloat1":5.44 }, "string2": "asdf", "array2" : [5,4]  }');  
+  json.DecodeText('{ "integer1": 5, "string1": "la", "null1": null, "mixedNestedArray": [{"name": "Nested object"}, 4, true, [null, null, 5] ], "object1" : { "subint1":5, "substring1":"lala", "subfloat1":5.44 }, "string2": "asdf", "array2" : [5,4]  }');  
+END_IF
+
+IF evaluate
+THEN
+  evaluate := FALSE;
+  
+  integer1 := json.Element('integer1').AsString();
+  string1 := json.Element('string1').AsString();
+  null1 := json.Element('null1').AsString();
+  mixedNestedArray_0_name := json.Element('mixedNestedArray[0].name').AsString();
+  mixedNestedArray_1  := json.Element('mixedNestedArray[1]').AsString();
+  mixedNestedArray_2  := json.Element('mixedNestedArray[2]').AsString();
+  mixedNestedArray_3_0 := json.Element('mixedNestedArray[3][0]').AsString();
+  mixedNestedArray_3_1 := json.Element('mixedNestedArray[3][1]').AsString();
+  mixedNestedArray_3_2 := json.Element('mixedNestedArray[3][2]').AsString();
+  object1_subint1 := json.Element('object1.subint1').AsString();
+  object1_substring1 := json.Element('object1.substring1').AsString();
+  object1_subfloat1 := json.Element('object1.subfloat1').AsString();
+  string2 := json.Element('string2').AsString();
+  array2_0 := json.Element('array2[0]').AsString();
+  array2_1 := json.Element('array2[0]').AsString();
 END_IF]]></ST>
     </Implementation>
   </POU>
