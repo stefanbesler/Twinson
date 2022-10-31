@@ -13,5 +13,21 @@ VAR_INPUT
   message : STRING(255); // The identifying message for the assertion error
 END_VAR]]></Declaration>
     </Method>
+    <Method Name="IsFalse" Id="{022665a8-9003-4aaa-8ef4-bd39fe196883}">
+      <Declaration><![CDATA[/// Asserts that a condition is false. If it is not, an assertion error is created.
+METHOD PUBLIC IsFalse
+VAR_INPUT
+  condition : BOOL; //< Condition to be checked
+  message : STRING(255); //< The identifying message for the assertion error
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="IsTrue" Id="{c415013c-c271-42ba-83ad-6c2c653d8f2e}">
+      <Declaration><![CDATA[/// Asserts that a condition is true. If it is not, an assertion error is created.
+METHOD PUBLIC IsTrue
+VAR_INPUT
+  condition : BOOL; //< Condition to be checked
+  message : STRING(255); //< The identifying message for the assertion error
+END_VAR]]></Declaration>
+    </Method>
   </Itf>
 </TcPlcObject>

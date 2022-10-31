@@ -1,0 +1,625 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MAIN" Id="{d1588a57-658c-417a-9177-028dcf9d9d1c}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR CONSTANT
+  RepetionCount : DINT := 1000;  
+  ExamplesCount : INT := 3;
+END_VAR
+VAR
+  _example0 : STRING(1023) := '{ "string1":"string1","string2":"string2","string3":"string3"}';  
+
+  _example1 : STRING(1023) := '{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                 "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }';
+								   
+  _example2 : STRING(1023) := '{ "array1": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"], 
+                                 "array2": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"],
+                                 "array3": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"] }';
+									  
+  _example3 : STRING(3000) := '{ "array1": [{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }],
+                                 "array2": [{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }],
+                                 "array3": [{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }]}';  
+
+  _jsonTwinson : Twinson.JsonDecoder;
+  _jsonTc3 : Tc3_JsonXml.FB_JsonDomParser;
+  _jsonTc3Document : Tc3_JsonXml.SJsonValue;
+  	
+  _step : INT := 0;
+  _dt, _it, _jt : DINT := 0;
+  
+  _twinsonStatistic, _tc3JsonDomParserStatistic : MovingStatistic;
+  _averageTwinsonMean, _averageTwinsonSigma, _averageTc3JsonDomParserMean, _averageTc3JsonDomParserSigma : ARRAY[0..3] OF LREAL; 
+  _cpucounter : Tc2_System.GETCPUACCOUNT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[REPEAT
+  CASE _step
+  OF
+    // setup ****************************************************
+    0: 
+    // **********************************************************
+
+      _twinsonStatistic.Reset();
+      _tc3JsonDomParserStatistic.Reset();      
+      _it := 0;
+      _jt := 0;
+      _step := 1;
+  
+    // iterate start ********************************************
+    1: 
+    // **********************************************************
+    
+      _twinsonStatistic.Reset();
+      _tc3JsonDomParserStatistic.Reset();      
+      _step := 2;
+      
+    // iterate loop *********************************************
+    2: 
+    // **********************************************************
+    
+      _tc3JsonDomParserStatistic.Append(ProcessTc3JsonDomParser(_it));
+      _twinsonStatistic.Append(ProcessTwinson(_it));
+	  
+      _jt := _jt + 1;
+      IF _jt > RepetionCount
+      THEN   
+        _step := 3;
+      END_IF
+
+      
+    // iterate end **********************************************
+    3: 
+    // **********************************************************
+    
+      _averageTwinsonMean[_it] := _twinsonStatistic.Mean / 10; // us
+      _averageTwinsonSigma[_it] := _twinsonStatistic.Sigma / 10; // us
+      _averageTc3JsonDomParserMean[_it] := _tc3JsonDomParserStatistic.Mean / 10; // us
+      _averageTc3JsonDomParserSigma[_it] := _tc3JsonDomParserStatistic.Sigma / 10; // us
+      _it := _it + 1;
+      _jt := 0;     
+      IF _it > ExamplesCount
+      THEN
+        _step := 4;
+      ELSE
+        _step := 1;
+      END_IF
+
+    // done******* **********************************************
+    4: 
+    // **********************************************************
+      ; 
+  END_CASE
+UNTIL _step = 4 
+AND_THEN TRUE // wtf, fix this already Beckhoff - no breakpoints without an additional condition!!!! 
+END_REPEAT
+
+_step := 4;]]></ST>
+    </Implementation>
+    <Method Name="ProcessTc3JsonDomParser" Id="{61bb2e29-ceba-403c-897f-286b751c77b7}">
+      <Declaration><![CDATA[METHOD ProcessTc3JsonDomParser : LREAL
+VAR_INPUT
+  example : DINT;
+END_VAR
+VAR
+  cpuAccount : UDINT;
+  
+  ary : Tc3_JsonXml.SJsonValue;
+  obj : Tc3_JsonXml.SJsonValue;  
+  
+  string1 : STRING;
+  string2 : STRING;
+  string3 : STRING;
+  string4 : STRING;
+  string5 : STRING;
+  string6 : STRING;
+  string7 : STRING;
+  string8 : STRING;
+  string9 : STRING;
+  string10 : STRING;  
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(*
+  _example0 : STRING(1023) := '{ "string1":"string1","string2":"string2","string3":"string3"}';  
+
+  _example1 : STRING(1023) := '{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                 "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }';
+								   
+  _example2 : STRING(1023) := '{ "array1": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"], 
+                                 "array2": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"],
+                                 "array3": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"], }';
+									  
+  _example3 : STRING(1023) := '{ "array1": [{ "string1":"string1","string2":"string2","string3":"string3" }, {"string1":"string1","string2":"string2","string3":"string3"}, { "string1":"string1","string2":"string2","string3":"string3"} ], 
+                                 "array2": [{ "string1":"string1","string2":"string2","string3":"string3" }, {"string1":"string1","string2":"string2","string3":"string3"}, { "string1":"string1","string2":"string2","string3":"string3"} ], 
+                                 "array3": [{ "string1":"string1","string2":"string2","string3":"string3" }, {"string1":"string1","string2":"string2","string3":"string3"}, { "string1":"string1","string2":"string2","string3":"string3"} ]
+                               }'; 
+*)
+
+CASE example
+OF
+  0:
+(*
+  _example0 : STRING(1023) := '{ "string1":"string1","string2":"string2","string3":"string3"}'; 
+*)  
+  
+    _cpucounter(cpuAccountDW => cpuAccount);  
+    _jsonTc3Document := _jsonTc3.ParseDocument(_example0);
+    
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string1'));
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string2'));
+    string3 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string3'));
+
+    _cpucounter();
+    ProcessTc3JsonDomParser := (_cpucounter.cpuAccountDW - cpuAccount);  // ns
+    
+  1:
+(*
+  _example1 : STRING(1023) := '{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                 "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }';
+*)     
+  
+    _cpucounter(cpuAccountDW => cpuAccount);  
+    _jsonTc3Document := _jsonTc3.ParseDocument(_example1);
+    
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string1'));
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string2'));
+    string3 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string3'));
+    string4 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string4'));
+    string5 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string5'));
+    string6 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string6'));
+    string7 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string7'));
+    string8 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string8'));
+    string9 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string9'));
+    string10 := _jsonTc3.GetString(_jsonTc3.FindMember(_jsonTc3Document, 'string10'));
+
+    _cpucounter();
+    ProcessTc3JsonDomParser := (_cpucounter.cpuAccountDW - cpuAccount);  // ns
+
+  2:
+(*
+  _example2 : STRING(1023) := '{ "array1": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"], 
+                                 "array2": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"],
+                                 "array3": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"] }';
+*)   
+  
+    _cpucounter(cpuAccountDW => cpuAccount);  
+    _jsonTc3Document := _jsonTc3.ParseDocument(_example2);
+    
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    string1 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 0));
+    string2 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 1));
+    string3 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 2));
+    string4 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 3));
+    string5 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 4));
+    string6 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 5));
+    string7 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 6));
+    string8 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 7));
+    string9 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 8));
+    string10 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 9));
+
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');    
+    string1 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 0));
+    string2 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 1));
+    string3 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 2));
+    string4 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 3));
+    string5 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 4));
+    string6 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 5));
+    string7 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 6));
+    string8 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 7));
+    string9 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 8));
+    string10 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 9));
+
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');    
+    string1 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 0));
+    string2 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 1));
+    string3 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 2));
+    string4 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 3));
+    string5 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 4));
+    string6 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 5));
+    string7 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 6));
+    string8 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 7));
+    string9 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 8));
+    string10 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 9));    
+    
+    _cpucounter();
+    ProcessTc3JsonDomParser := (_cpucounter.cpuAccountDW - cpuAccount);  // ns
+
+  3:
+(*
+  _example3 : STRING(1023) := '{ "array1": [{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }],
+                                 "array2": [{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }],
+                                 "array3": [{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }]}'; 
+*)     
+
+    _cpucounter(cpuAccountDW => cpuAccount);  
+    _jsonTc3Document := _jsonTc3.ParseDocument(_example3);
+    
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);    
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));
+    
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);    
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));
+    
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);    
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));        
+
+
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);    
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));
+    
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);    
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));
+    
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);    
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));   
+
+
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);    
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));
+    
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);    
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));
+    
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);    
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));       
+    
+    _cpucounter();
+    ProcessTc3JsonDomParser := (_cpucounter.cpuAccountDW - cpuAccount);  // ns
+END_CASE
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ProcessTwinson" Id="{e00edbfc-a586-472f-9e91-234e99127f4b}">
+      <Declaration><![CDATA[METHOD ProcessTwinson : LREAL
+VAR_INPUT
+  example : DINT;
+END_VAR
+VAR
+  cpuAccount : UDINT;
+
+  string1 : STRING;
+  string2 : STRING;
+  string3 : STRING;
+  string4 : STRING;
+  string5 : STRING;
+  string6 : STRING;
+  string7 : STRING;
+  string8 : STRING;
+  string9 : STRING;
+  string10 : STRING; 
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE example
+OF
+  0:
+(*
+  _example0 : STRING(1023) := '{ "string1":"string1","string2":"string2","string3":"string3"}'; 
+*)  
+  
+    _cpucounter(cpuAccountDW => cpuAccount);  
+  	_jsonTwinson.DecodeString(_example0);
+	
+    string1 := _jsonTwinson.Element('string1').AsString();
+    string2 := _jsonTwinson.Element('string2').AsString();
+    string3 := _jsonTwinson.Element('string3').AsString();
+    
+    _cpucounter();
+    ProcessTwinson := (_cpucounter.cpuAccountDW - cpuAccount);  // ns
+	
+  1:
+(*
+  _example1 : STRING(1023) := '{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                 "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }';
+*)   
+    _cpucounter(cpuAccountDW => cpuAccount);  
+  	_jsonTwinson.DecodeString(_example1);
+	
+    string1 := _jsonTwinson.Element('string1').AsString();
+    string2 := _jsonTwinson.Element('string2').AsString();
+    string3 := _jsonTwinson.Element('string3').AsString();
+    string4 := _jsonTwinson.Element('string4').AsString();
+    string5 := _jsonTwinson.Element('string5').AsString();
+    string6 := _jsonTwinson.Element('string6').AsString();
+    string7 := _jsonTwinson.Element('string7').AsString();
+    string8 := _jsonTwinson.Element('string8').AsString();
+    string9 := _jsonTwinson.Element('string9').AsString();
+    string10 := _jsonTwinson.Element('string10').AsString();
+    
+    _cpucounter();
+    ProcessTwinson := (_cpucounter.cpuAccountDW - cpuAccount);  // ns
+
+  2:
+(*
+  _example2 : STRING(1023) := '{ "array1": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"], 
+                                 "array2": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"],
+                                 "array3": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"] }';
+*)   
+    _cpucounter(cpuAccountDW => cpuAccount);  
+  	_jsonTwinson.DecodeString(_example2);
+	
+    string1 := _jsonTwinson.Element('array1[0]').AsString();
+    string2 := _jsonTwinson.Element('array1[1]').AsString();
+    string3 := _jsonTwinson.Element('array1[2]').AsString();
+    string4 := _jsonTwinson.Element('array1[3]').AsString();
+    string5 := _jsonTwinson.Element('array1[4]').AsString();
+    string6 := _jsonTwinson.Element('array1[5]').AsString();
+    string7 := _jsonTwinson.Element('array1[6]').AsString();
+    string8 := _jsonTwinson.Element('array1[7]').AsString();
+    string9 := _jsonTwinson.Element('array1[8]').AsString();
+    string10 := _jsonTwinson.Element('array1[9]').AsString();
+    
+    string1 := _jsonTwinson.Element('array2[0]').AsString();
+    string2 := _jsonTwinson.Element('array2[1]').AsString();
+    string3 := _jsonTwinson.Element('array2[2]').AsString();
+    string4 := _jsonTwinson.Element('array2[3]').AsString();
+    string5 := _jsonTwinson.Element('array2[4]').AsString();
+    string6 := _jsonTwinson.Element('array2[5]').AsString();
+    string7 := _jsonTwinson.Element('array2[6]').AsString();
+    string8 := _jsonTwinson.Element('array2[7]').AsString();
+    string9 := _jsonTwinson.Element('array2[8]').AsString();
+    string10 := _jsonTwinson.Element('array2[9]').AsString();
+
+    string1 := _jsonTwinson.Element('array3[0]').AsString();
+    string2 := _jsonTwinson.Element('array3[1]').AsString();
+    string3 := _jsonTwinson.Element('array3[2]').AsString();
+    string4 := _jsonTwinson.Element('array3[3]').AsString();
+    string5 := _jsonTwinson.Element('array3[4]').AsString();
+    string6 := _jsonTwinson.Element('array3[5]').AsString();
+    string7 := _jsonTwinson.Element('array3[6]').AsString();
+    string8 := _jsonTwinson.Element('array3[7]').AsString();
+    string9 := _jsonTwinson.Element('array3[8]').AsString();
+    string10 := _jsonTwinson.Element('array3[9]').AsString();   
+    
+    _cpucounter();
+    ProcessTwinson := (_cpucounter.cpuAccountDW - cpuAccount); // ns
+
+  3:
+(*
+  _example3 : STRING(1023) := '{ "array1": [{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }],
+                                 "array2": [{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }],
+                                 "array3": [{ "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }, 
+                                            { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                              "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }]}'; 
+*)    
+  
+    _cpucounter(cpuAccountDW => cpuAccount);  
+  	_jsonTwinson.DecodeString(_example3);
+	
+    string1 := _jsonTwinson.Element('array1[0].string1').AsString();
+    string2 := _jsonTwinson.Element('array1[0].string2').AsString();
+    string3 := _jsonTwinson.Element('array1[0].string3').AsString();
+    string4 := _jsonTwinson.Element('array1[0].string4').AsString();
+    string5 := _jsonTwinson.Element('array1[0].string5').AsString();
+    string6 := _jsonTwinson.Element('array1[0].string6').AsString();
+    string7 := _jsonTwinson.Element('array1[0].string7').AsString();
+    string8 := _jsonTwinson.Element('array1[0].string8').AsString();
+    string9 := _jsonTwinson.Element('array1[0].string9').AsString();
+    string10 := _jsonTwinson.Element('array1[0].string10').AsString();
+    
+    string1 := _jsonTwinson.Element('array1[1].string1').AsString();
+    string2 := _jsonTwinson.Element('array1[1].string2').AsString();
+    string3 := _jsonTwinson.Element('array1[1].string3').AsString();
+    string4 := _jsonTwinson.Element('array1[1].string4').AsString();
+    string5 := _jsonTwinson.Element('array1[1].string5').AsString();
+    string6 := _jsonTwinson.Element('array1[1].string6').AsString();
+    string7 := _jsonTwinson.Element('array1[1].string7').AsString();
+    string8 := _jsonTwinson.Element('array1[1].string8').AsString();
+    string9 := _jsonTwinson.Element('array1[1].string9').AsString();
+    string10 := _jsonTwinson.Element('array1[1].string10').AsString();    
+    
+    string1 := _jsonTwinson.Element('array1[2].string1').AsString();
+    string2 := _jsonTwinson.Element('array1[2].string2').AsString();
+    string3 := _jsonTwinson.Element('array1[2].string3').AsString();
+    string4 := _jsonTwinson.Element('array1[2].string4').AsString();
+    string5 := _jsonTwinson.Element('array1[2].string5').AsString();
+    string6 := _jsonTwinson.Element('array1[2].string6').AsString();
+    string7 := _jsonTwinson.Element('array1[2].string7').AsString();
+    string8 := _jsonTwinson.Element('array1[2].string8').AsString();
+    string9 := _jsonTwinson.Element('array1[2].string9').AsString();
+    string10 := _jsonTwinson.Element('array1[2].string10').AsString();    
+
+
+    string1 := _jsonTwinson.Element('array2[0].string1').AsString();
+    string2 := _jsonTwinson.Element('array2[0].string2').AsString();
+    string3 := _jsonTwinson.Element('array2[0].string3').AsString();
+    string4 := _jsonTwinson.Element('array2[0].string4').AsString();
+    string5 := _jsonTwinson.Element('array2[0].string5').AsString();
+    string6 := _jsonTwinson.Element('array2[0].string6').AsString();
+    string7 := _jsonTwinson.Element('array2[0].string7').AsString();
+    string8 := _jsonTwinson.Element('array2[0].string8').AsString();
+    string9 := _jsonTwinson.Element('array2[0].string9').AsString();
+    string10 := _jsonTwinson.Element('array2[0].string10').AsString();
+    
+    string1 := _jsonTwinson.Element('array2[1].string1').AsString();
+    string2 := _jsonTwinson.Element('array2[1].string2').AsString();
+    string3 := _jsonTwinson.Element('array2[1].string3').AsString();
+    string4 := _jsonTwinson.Element('array2[1].string4').AsString();
+    string5 := _jsonTwinson.Element('array2[1].string5').AsString();
+    string6 := _jsonTwinson.Element('array2[1].string6').AsString();
+    string7 := _jsonTwinson.Element('array2[1].string7').AsString();
+    string8 := _jsonTwinson.Element('array2[1].string8').AsString();
+    string9 := _jsonTwinson.Element('array2[1].string9').AsString();
+    string10 := _jsonTwinson.Element('array2[1].string10').AsString();    
+    
+    string1 := _jsonTwinson.Element('array2[2].string1').AsString();
+    string2 := _jsonTwinson.Element('array2[2].string2').AsString();
+    string3 := _jsonTwinson.Element('array2[2].string3').AsString();
+    string4 := _jsonTwinson.Element('array2[2].string4').AsString();
+    string5 := _jsonTwinson.Element('array2[2].string5').AsString();
+    string6 := _jsonTwinson.Element('array2[2].string6').AsString();
+    string7 := _jsonTwinson.Element('array2[2].string7').AsString();
+    string8 := _jsonTwinson.Element('array2[2].string8').AsString();
+    string9 := _jsonTwinson.Element('array2[2].string9').AsString();
+    string10 := _jsonTwinson.Element('array2[2].string10').AsString(); 
+
+
+    string1 := _jsonTwinson.Element('array3[0].string1').AsString();
+    string2 := _jsonTwinson.Element('array3[0].string2').AsString();
+    string3 := _jsonTwinson.Element('array3[0].string3').AsString();
+    string4 := _jsonTwinson.Element('array3[0].string4').AsString();
+    string5 := _jsonTwinson.Element('array3[0].string5').AsString();
+    string6 := _jsonTwinson.Element('array3[0].string6').AsString();
+    string7 := _jsonTwinson.Element('array3[0].string7').AsString();
+    string8 := _jsonTwinson.Element('array3[0].string8').AsString();
+    string9 := _jsonTwinson.Element('array3[0].string9').AsString();
+    string10 := _jsonTwinson.Element('array3[0].string10').AsString();
+    
+    string1 := _jsonTwinson.Element('array3[1].string1').AsString();
+    string2 := _jsonTwinson.Element('array3[1].string2').AsString();
+    string3 := _jsonTwinson.Element('array3[1].string3').AsString();
+    string4 := _jsonTwinson.Element('array3[1].string4').AsString();
+    string5 := _jsonTwinson.Element('array3[1].string5').AsString();
+    string6 := _jsonTwinson.Element('array3[1].string6').AsString();
+    string7 := _jsonTwinson.Element('array3[1].string7').AsString();
+    string8 := _jsonTwinson.Element('array3[1].string8').AsString();
+    string9 := _jsonTwinson.Element('array3[1].string9').AsString();
+    string10 := _jsonTwinson.Element('array3[1].string10').AsString();    
+    
+    string1 := _jsonTwinson.Element('array3[2].string1').AsString();
+    string2 := _jsonTwinson.Element('array3[2].string2').AsString();
+    string3 := _jsonTwinson.Element('array3[2].string3').AsString();
+    string4 := _jsonTwinson.Element('array3[2].string4').AsString();
+    string5 := _jsonTwinson.Element('array3[2].string5').AsString();
+    string6 := _jsonTwinson.Element('array3[2].string6').AsString();
+    string7 := _jsonTwinson.Element('array3[2].string7').AsString();
+    string8 := _jsonTwinson.Element('array3[2].string8').AsString();
+    string9 := _jsonTwinson.Element('array3[2].string9').AsString();
+    string10 := _jsonTwinson.Element('array3[2].string10').AsString();     
+    
+    _cpucounter();
+    ProcessTwinson := (_cpucounter.cpuAccountDW - cpuAccount);  // ns
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

@@ -4,7 +4,7 @@
     <Declaration><![CDATA[FUNCTION_BLOCK JsonElement IMPLEMENTS IJsonElement
 VAR_INPUT
   Path : STRING(ParameterList.MaxJsonKeyLength);
-  Hash : LINT;
+  PathLen : DWORD;
   StartPtr : POINTER TO BYTE;
   EndPtr : POINTER TO BYTE;
   ValueType : JsonElementType;

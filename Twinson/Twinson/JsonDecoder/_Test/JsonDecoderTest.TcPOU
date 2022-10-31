@@ -5,8 +5,8 @@
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="AddArrayIndexToKeyTest" Id="{997eece4-29aa-4921-82a5-00c9de6877a1}">
-      <Declaration><![CDATA[METHOD AddArrayIndexToKeyTest
+    <Method Name="Test_AddArrayIndexToKey" Id="{997eece4-29aa-4921-82a5-00c9de6877a1}">
+      <Declaration><![CDATA[METHOD Test_AddArrayIndexToKey
 VAR_INPUT
   assertions : IAssertions;
 END_VAR]]></Declaration>
@@ -35,6 +35,54 @@ _path := 'ary['; _pathPtr := ADR(_path) + 4;
 AddArrayIndexToKey(55);
 _pathPtr^ := 0;
 assertions.EqualsString(expected := 'ary[55]', actual := _path, message:='Index 55 is correctly converted to an array index key');]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Decode_NestedArray" Id="{8270d688-a825-4732-8ad8-272f25321512}">
+      <Declaration><![CDATA[METHOD Test_Decode_NestedArray
+VAR_INPUT
+  assertions : IAssertions;
+END_VAR
+VAR
+  element0 : IJsonElement;
+  element1 : IJsonElement;
+  element2 : IJsonElement;  
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[DecodeString('[[[4,2,3]]]');
+element0 := Element('array[0][0][0]');
+element1 := Element('array[0][0][1]');
+element2 := Element('array[0][0][2]');
+
+assertions.IsTrue(element0 <> 0, '');
+assertions.IsTrue(element1 <> 0, '');
+assertions.IsTrue(element2 <> 0, '');
+
+IF element0 <> 0 AND element1 <> 0 AND element2 <> 0
+THEN
+	assertions.EqualsString('4', element0.AsString(), '');
+	assertions.EqualsString('2', element1.AsString(), '');
+	assertions.EqualsString('3', element2.AsString(), '');
+END_IF
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_SkipWhitespace" Id="{dc82c6e9-cadf-4c97-bb57-c8902c8d6d57}">
+      <Declaration><![CDATA[METHOD Test_SkipWhitespace
+VAR_INPUT
+  assertions : IAssertions;
+END_VAR
+VAR
+  json : STRING;  
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[json := '              
+
+        !';
+_jsonPtr := ADR(json);
+SkipWhitespaces();
+
+_jsonPtr^ := 16#33;]]></ST>
       </Implementation>
     </Method>
   </POU>

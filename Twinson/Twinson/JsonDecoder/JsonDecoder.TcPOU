@@ -22,7 +22,7 @@ END_VAR]]></Declaration>
     </Implementation>
     <Method Name="Abort" Id="{151abc50-572e-41de-9235-590a6cc2cb06}">
       <Declaration><![CDATA[METHOD PROTECTED Abort
-VAR_INPUT
+VAR_IN_OUT CONSTANT
   errorMessage : STRING;
 END_VAR
 ]]></Declaration>
@@ -76,8 +76,8 @@ VAR
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[element REF= _elements[_elementCount];
-
 element.Path := _path;
+element.PathLen := _pathPtr - ADR(_path) - 1;
 element.ValueType := _el;
 element.StartPtr := _memPtr;
 element.EndPtr := _jsonPtr;
@@ -97,13 +97,13 @@ END_WHILE
 _pathPtr^ := 0;]]></ST>
       </Implementation>
     </Method>
-    <Method Name="DecodeText" Id="{bd0f2002-7d0a-4d67-a5d7-f7acec12df17}">
-      <Declaration><![CDATA[METHOD DecodeText
+    <Method Name="Decode" Id="{9e0a559b-3090-4700-8907-be0f1642151e}">
+      <Declaration><![CDATA[METHOD Decode
 VAR_INPUT
-  json : STRING(ParameterList.MaxJsonLength);
+  json : POINTER TO BYTE;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_jsonPtr := ADR(json);
+        <ST><![CDATA[_jsonPtr := json;
 _path := '';
 _pathPtr := ADR(_path);
 _elementCount := 0;
@@ -114,9 +114,15 @@ WHILE _jsonPtr^ <> 0
 DO
   SkipWhitespaces();
 
-  IF GuessElementType() = JsonElementType.Object
+  _el := GuessElementType();
+  IF _el = JsonElementType.Object
   THEN
     ParseObject();
+  ELSIF _el = JsonElementType.Arry
+  THEN
+    _path := 'array';
+    _pathPtr := _pathPtr + 5;
+    ParseArray();
   ELSE
     Abort('Unexpected character');    
   END_IF  
@@ -125,9 +131,18 @@ DO
 END_WHILE]]></ST>
       </Implementation>
     </Method>
+    <Method Name="DecodeString" Id="{bd0f2002-7d0a-4d67-a5d7-f7acec12df17}">
+      <Declaration><![CDATA[METHOD DecodeString
+VAR_IN_OUT CONSTANT
+  json : STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Decode(ADR(json));]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Element" Id="{4a76f022-7ad8-455a-86cd-e4ff5a774583}">
       <Declaration><![CDATA[METHOD Element : IJsonElement
-VAR_INPUT
+VAR_IN_OUT CONSTANT
   path : STRING;
 END_VAR
 VAR
@@ -137,11 +152,11 @@ END_VAR
       <Implementation>
         <ST><![CDATA[FOR i:=0 TO _elementCount
 DO
-  IF _elements[i].path = path
+  IF path = _elements[i].Path
   THEN
     Element := _elements[i];
-    RETURN;
-	END_IF
+    RETURN;	  
+  END_IF
 END_FOR]]></ST>
       </Implementation>
     </Method>
@@ -384,7 +399,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[ch := _jsonPtr^;
-WHILE(ch = 16#20 OR_ELSE ch = 16#12 OR_ELSE ch = 16#15 OR_ELSE ch = 16#11 OR_ELSE ch = 0)
+WHILE ch > 0 AND_THEN ch <= 16#20
 DO
   _jsonPtr := _jsonPtr + 1;
   ch := _jsonPtr^;

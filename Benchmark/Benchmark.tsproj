@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.35">
-	<Project ProjectGUID="{4DF7A4E5-A494-4507-B1A6-5F3C213DCC74}" Target64Bit="true" ShowHideConfigurations="#x106">
+	<Project ProjectGUID="{072FA0DE-2B58-429E-A171-0A0C055F18E4}" Target64Bit="true" ShowHideConfigurations="#x106">
 		<System>
 			<Settings MaxCpus="4" NonWinCpus="1">
 				<Cpu CpuId="3"/>
@@ -12,9 +12,9 @@
 			</Tasks>
 		</System>
 		<Plc>
-			<Project GUID="{CED08849-BA70-4893-887E-F33DB9BA4C06}" Name="Example" PrjFilePath="Example\Example.plcproj" TmcFilePath="Example\Example.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="Example\Example.tmc" TmcHash="{78D0F25B-4E3E-A5AB-5130-CE94D36EDE9E}">
-					<Name>Example Instance</Name>
+			<Project GUID="{1187505C-F72E-4DFF-AE32-175AE96FDE48}" Name="Benchmark" PrjFilePath="Benchmark\Benchmark.plcproj" TmcFilePath="Benchmark\Benchmark.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="Benchmark\Benchmark.tmc" TmcHash="{9D15DB6C-05BA-1B4C-79FC-3A095D3A7944}">
+					<Name>Benchmark Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Contexts>
 						<Context>
