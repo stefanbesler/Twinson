@@ -14,4 +14,4 @@ Simple and lightweight JSON decoder for TwinCAT and CODESYS.
 - [x] Basic element access
 - [ ] Monadic element access
 - [ ] Unittests
-- [ ] Performance improvments for accessing elements, use tree to store date instead of array
+- [ ] Performance improvements for accessing elements, use tree to store data instead of array
