@@ -25,17 +25,7 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[json.DecodeString('[[[4,2,3]]]');
-
-json.DecodeString('{[[[4,2,3]]]}');
-
-json.DecodeString('[4,
-                    2,
-                    3]');
-                    
-
-
-IF parse
+      <ST><![CDATA[IF parse
 THEN
   parse := FALSE;
   json.DecodeString('{ "integer1": 5, "string1": "la", "null1": null, "mixedNestedArray": [{"name": "Nested object"}, 4, true, [null, null, 5] ], "object1" : { "subint1":5, "substring1":"lala", "subfloat1":5.44 }, "string2": "asdf", "array2" : [5,4]  }');  
