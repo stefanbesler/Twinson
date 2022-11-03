@@ -187,15 +187,14 @@ DO
 
   _el := GuessElementType();
   IF _el = JsonElementType.Object
-  THEN
-    _root.Name := '';
-    _root.IsArray := FALSE;  
+  THEN 
     ParseObject(_root);
   ELSIF _el = JsonElementType.Arry
   THEN
-    _root.Name := 'list';
-    _root.IsArray := TRUE;
-    ParseArray(_root);
+    _memPtr := _jsonPtr;
+    _root.FirstChild REF= AddNode(_root);
+    _root.FirstChild.Name := 'array';
+    ParseArray(_root.FirstChild);
   ELSE
     Abort('Unexpected character');    
   END_IF  
@@ -251,6 +250,46 @@ OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Method Name="IntToString" Id="{0844489d-f692-4848-a8a9-c7fd5ee901c8}">
+      <Declaration><![CDATA[METHOD PROTECTED IntToString
+VAR_INPUT
+  element : INT;
+END_VAR
+VAR_IN_OUT CONSTANT
+  str : STRING;
+END_VAR
+VAR
+  writePtr : POINTER TO BYTE;
+  reversePtr : POINTER TO BYTE;  
+  endPtr : POINTER TO BYTE;  
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[writePtr := ADR(str);
+reversePtr := ADR(str);
+
+// we have to write the index in reverse, for element 12, we first build a string
+// that looks like 21 and then we reverse it
+// todo: test if a seperate branch for element < 10 is faster than doing the generic algorithm for this edge case as well
+REPEAT
+  writePtr^ := INT_TO_BYTE(element MOD 10) + 16#30; writePtr := writePtr + 1;
+  element := element / 10; 
+UNTIL element = 0 END_REPEAT
+writePtr^ := 0;
+
+// reverse string with XOR swap algorithm
+endPtr := writePtr - 1;
+WHILE reversePtr < endPtr
+DO
+  // swap first and last
+  reversePtr^ := endPtr^ XOR reversePtr^;
+  endPtr^ := reversePtr^ XOR endPtr^;
+  reversePtr^ := endPtr^ XOR reversePtr^;
+  
+  reversePtr := reversePtr + 1;
+  endPtr := endPtr - 1;
+END_WHILE]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="ParseArray" Id="{31f9e53c-038a-44b5-a16c-e5766a0048e5}">
       <Declaration><![CDATA[METHOD PROTECTED ParseArray
 VAR_INPUT
@@ -268,7 +307,7 @@ _jsonPtr := _jsonPtr + 1;
 REPEAT
 
   child REF= AddNode(node);
-  WriteArrayIndexAsNodeName(child, elements);
+  IntToString(elements, child.Name);
   elements := elements + 1;
   ParseElement(child);
   
@@ -459,44 +498,6 @@ WHILE ch > 0 AND_THEN ch <= 16#20
 DO
   _jsonPtr := _jsonPtr + 1;
   ch := _jsonPtr^;
-END_WHILE]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="WriteArrayIndexAsNodeName" Id="{0844489d-f692-4848-a8a9-c7fd5ee901c8}">
-      <Declaration><![CDATA[METHOD PROTECTED WriteArrayIndexAsNodeName
-VAR_INPUT
-  node : REFERENCE TO JsonNode;
-  element : INT;
-END_VAR
-VAR
-  writePtr : POINTER TO BYTE;
-  reversePtr : POINTER TO BYTE;  
-  endPtr : POINTER TO BYTE;  
-END_VAR]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[writePtr := ADR(node.Name);
-reversePtr := ADR(node.Name);
-
-// we have to write the index in reverse, for element 12, we first build a string
-// that looks like 21 and then we reverse it
-// todo: test if a seperate branch for element < 10 is faster than doing the generic algorithm for this edge case as well
-REPEAT
-  writePtr^ := INT_TO_BYTE(element MOD 10) + 16#30; writePtr := writePtr + 1;
-  element := element / 10; 
-UNTIL element = 0 END_REPEAT
-writePtr^ := 0;
-
-// reverse string with XOR swap algorithm
-endPtr := writePtr - 1;
-WHILE reversePtr < endPtr
-DO
-  // swap first and last
-  reversePtr^ := endPtr^ XOR reversePtr^;
-  endPtr^ := reversePtr^ XOR endPtr^;
-  reversePtr^ := endPtr^ XOR reversePtr^;
-  
-  reversePtr := reversePtr + 1;
-  endPtr := endPtr - 1;
 END_WHILE]]></ST>
       </Implementation>
     </Method>

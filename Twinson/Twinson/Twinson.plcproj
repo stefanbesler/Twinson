@@ -64,17 +64,6 @@
       <SubType>Content</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <SubObject Include="JsonDecoderTest.Test_AddArrayIndexToKey">
-      <ExcludeFromBuild>true</ExcludeFromBuild>
-    </SubObject>
-    <SubObject Include="JsonDecoderTest.Test_Decode_NestedArray">
-      <ExcludeFromBuild>true</ExcludeFromBuild>
-    </SubObject>
-    <SubObject Include="JsonDecoderTest.Test_SkipWhitespace">
-      <ExcludeFromBuild>true</ExcludeFromBuild>
-    </SubObject>
-  </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
