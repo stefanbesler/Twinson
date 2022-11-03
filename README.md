@@ -27,4 +27,13 @@ Twinson is lightweight alternative to Beckhoff's `Tc3_Json.FB_JsonDomParser`. Wh
 
 Twinson includes a seperate PLC for benchmarking the library against Tc3_Json. The benchmark uses several examples with increasing JSON complexity. We measure the duration it takes for parsing a JSON document and assigning all members of the JSON document to TwinCAT variables with direct element access.
 
+- Example 1: Object with 3 key/value pairs
+- Example 2: Object with 10 key/value pairs
+- Example 3: Object with 3 arrays, each containing 10 strings
+- Example 4: Object with 3 arrays, each containing 3 objects and each object has 10 key/value pairs
+
+<div align="center">
+  <img alt="benchmark" src="https://raw.githubusercontent.com/stefanbesler/Twinson/main/benchmark.png" />
+</div>
+
 
