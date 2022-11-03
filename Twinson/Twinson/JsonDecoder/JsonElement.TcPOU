@@ -3,8 +3,6 @@
   <POU Name="JsonElement" Id="{a9d9bc4c-ecde-4f16-8328-473205f03d0b}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK JsonElement IMPLEMENTS IJsonElement
 VAR_INPUT
-  Path : STRING(ParameterList.MaxJsonKeyLength);
-  PathLen : DWORD;
   StartPtr : POINTER TO BYTE;
   EndPtr : POINTER TO BYTE;
   ValueType : JsonElementType;

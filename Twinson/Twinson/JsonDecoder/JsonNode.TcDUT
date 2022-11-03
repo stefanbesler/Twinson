@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="JsonNode" Id="{a7ff27e2-e209-4cf2-9b64-669f247284b6}">
+    <Declaration><![CDATA[TYPE JsonNode :
+STRUCT
+  Name : STRING;
+  Next : REFERENCE TO JsonNode;
+  FirstChild : REFERENCE TO JsonNode;
+  LastChild : REFERENCE TO JsonNode;
+  Element : REFERENCE TO JsonElement;
+  IsArray : BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

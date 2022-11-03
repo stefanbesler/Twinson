@@ -42,6 +42,9 @@
     <Compile Include="JsonDecoder\JsonElementType.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="JsonDecoder\JsonNode.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="JsonDecoder\_Test\JsonDecoderTest.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -60,6 +63,17 @@
     <None Include="Twinson.tmc">
       <SubType>Content</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <SubObject Include="JsonDecoderTest.Test_AddArrayIndexToKey">
+      <ExcludeFromBuild>true</ExcludeFromBuild>
+    </SubObject>
+    <SubObject Include="JsonDecoderTest.Test_Decode_NestedArray">
+      <ExcludeFromBuild>true</ExcludeFromBuild>
+    </SubObject>
+    <SubObject Include="JsonDecoderTest.Test_SkipWhitespace">
+      <ExcludeFromBuild>true</ExcludeFromBuild>
+    </SubObject>
   </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>
