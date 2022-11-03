@@ -3,7 +3,7 @@
   <POU Name="MAIN" Id="{d1588a57-658c-417a-9177-028dcf9d9d1c}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
 VAR CONSTANT
-  RepetionCount : DINT := 1000;  
+  RepetionCount : DINT := 100;  
   ExamplesCount : INT := 3;
 END_VAR
 VAR
@@ -42,73 +42,47 @@ VAR
   _step : INT := 0;
   _dt, _it, _jt : DINT := 0;
   
-  _twinsonStatistic, _tc3JsonDomParserStatistic : MovingStatistic;
-  _averageTwinsonMean, _averageTwinsonSigma, _averageTc3JsonDomParserMean, _averageTc3JsonDomParserSigma : ARRAY[0..3] OF LREAL; 
+  _twinsonStatistic, _tc3JsonDomParserStatistic : ARRAY[0..3] OF MovingStatistic; 
   _cpucounter : Tc2_System.GETCPUACCOUNT;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[REPEAT
-  CASE _step
-  OF
-    // setup ****************************************************
-    0: 
-    // **********************************************************
-
-      _twinsonStatistic.Reset();
-      _tc3JsonDomParserStatistic.Reset();      
-      _it := 0;
-      _jt := 0;
-      _step := 1;
+      <ST><![CDATA[
+CASE _step
+OF
+  // setup ****************************************************
+  0: 
+  // **********************************************************
+ 
+    _it := 0;
+    _jt := 0;
+    _step := 2;
+    
+  // iterate loop *********************************************
+  2: 
+  // **********************************************************
   
-    // iterate start ********************************************
-    1: 
-    // **********************************************************
+    _twinsonStatistic[_it].Append(ProcessTwinson(_it) / 10);    
+    _tc3JsonDomParserStatistic[_it].Append(ProcessTc3JsonDomParser(_it) / 10);
+  
+    _jt := _jt + 1;
+    IF _jt > RepetionCount
+    THEN   
+      _step := 3;
+    END_IF
+
     
-      _twinsonStatistic.Reset();
-      _tc3JsonDomParserStatistic.Reset();      
+  // iterate end **********************************************
+  3: 
+  // **********************************************************
+    _it := _it + 1;
+    _jt := 0;     
+    IF _it > ExamplesCount
+    THEN
+      _step := 0;
+    ELSE
       _step := 2;
-      
-    // iterate loop *********************************************
-    2: 
-    // **********************************************************
-    
-      _tc3JsonDomParserStatistic.Append(ProcessTc3JsonDomParser(_it));
-      _twinsonStatistic.Append(ProcessTwinson(_it));
-	  
-      _jt := _jt + 1;
-      IF _jt > RepetionCount
-      THEN   
-        _step := 3;
-      END_IF
-
-      
-    // iterate end **********************************************
-    3: 
-    // **********************************************************
-    
-      _averageTwinsonMean[_it] := _twinsonStatistic.Mean / 10; // us
-      _averageTwinsonSigma[_it] := _twinsonStatistic.Sigma / 10; // us
-      _averageTc3JsonDomParserMean[_it] := _tc3JsonDomParserStatistic.Mean / 10; // us
-      _averageTc3JsonDomParserSigma[_it] := _tc3JsonDomParserStatistic.Sigma / 10; // us
-      _it := _it + 1;
-      _jt := 0;     
-      IF _it > ExamplesCount
-      THEN
-        _step := 4;
-      ELSE
-        _step := 1;
-      END_IF
-
-    // done******* **********************************************
-    4: 
-    // **********************************************************
-      ; 
-  END_CASE
-UNTIL _step = 4 
-AND_THEN TRUE // wtf, fix this already Beckhoff - no breakpoints without an additional condition!!!! 
-END_REPEAT
-
-_step := 4;]]></ST>
+    END_IF
+END_CASE]]></ST>
     </Implementation>
     <Method Name="ProcessTc3JsonDomParser" Id="{61bb2e29-ceba-403c-897f-286b751c77b7}">
       <Declaration><![CDATA[METHOD ProcessTc3JsonDomParser : LREAL
@@ -202,38 +176,65 @@ OF
     
     ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
     string1 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 0));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');    
     string2 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 1));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');    
     string3 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 2));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');    
     string4 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 3));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');    
     string5 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 4));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');    
     string6 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 5));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');    
     string7 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 6));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');    
     string8 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 7));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');    
     string9 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 8));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');    
     string10 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 9));
 
     ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');    
     string1 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 0));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');    
     string2 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 1));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');    
     string3 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 2));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');    
     string4 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 3));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');    
     string5 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 4));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');    
     string6 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 5));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');    
     string7 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 6));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');    
     string8 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 7));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');    
     string9 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 8));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');    
     string10 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 9));
 
-    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');    
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
     string1 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 0));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
     string2 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 1));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
     string3 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 2));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
     string4 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 3));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
     string5 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 4));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
     string6 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 5));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
     string7 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 6));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
     string8 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 7));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
     string9 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 8));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
     string10 := _jsonTc3.GetString(_jsonTc3.GetArrayValueByIdx(ary, 9));    
     
     _cpucounter();
@@ -267,114 +268,282 @@ OF
     ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
     obj := _jsonTc3.GetArrayValueByIdx(ary, 0);    
     string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);        
     string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);        
     string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);        
     string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);        
     string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);        
     string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);        
     string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);        
     string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);        
     string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);        
     string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));
     
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);     
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);   
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
     obj := _jsonTc3.GetArrayValueByIdx(ary, 1);    
-    string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
-    string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
     string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);       
     string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);       
     string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);    
     string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);    
     string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));
     
-    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);    
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);   
     string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array1');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));        
 
 
     ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
     obj := _jsonTc3.GetArrayValueByIdx(ary, 0);    
     string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));
     
-    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);    
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));
     
-    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);    
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);   
     string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);       
     string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);       
     string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);       
     string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);       
     string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);       
     string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);       
     string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);       
     string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);       
     string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array2');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);       
     string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));   
 
 
     ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
     obj := _jsonTc3.GetArrayValueByIdx(ary, 0);    
     string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);       
     string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 0);      
     string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));
     
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
     obj := _jsonTc3.GetArrayValueByIdx(ary, 1);    
     string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 1);      
     string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));
     
-    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);    
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);  
     string1 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string1'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string2 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string2'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string3 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string3'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string4 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string4'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string5 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string5'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string6 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string6'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string7 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string7'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string8 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string8'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string9 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string9'));
+    ary := _jsonTc3.FindMember(_jsonTc3Document, 'array3');
+    obj := _jsonTc3.GetArrayValueByIdx(ary, 2);      
     string10 := _jsonTc3.GetString(_jsonTc3.FindMember(obj, 'string10'));       
     
     _cpucounter();
@@ -602,7 +771,7 @@ OF
     string7 := _jsonTwinson.Element('array3[1].string7').AsString();
     string8 := _jsonTwinson.Element('array3[1].string8').AsString();
     string9 := _jsonTwinson.Element('array3[1].string9').AsString();
-    string10 := _jsonTwinson.Element('array3[1].string10').AsString();    
+    string10 := _jsonTwinson.Element('array3[1].string10').AsString();
     
     string1 := _jsonTwinson.Element('array3[2].string1').AsString();
     string2 := _jsonTwinson.Element('array3[2].string2').AsString();
@@ -613,7 +782,7 @@ OF
     string7 := _jsonTwinson.Element('array3[2].string7').AsString();
     string8 := _jsonTwinson.Element('array3[2].string8').AsString();
     string9 := _jsonTwinson.Element('array3[2].string9').AsString();
-    string10 := _jsonTwinson.Element('array3[2].string10').AsString();     
+    string10 := _jsonTwinson.Element('array3[2].string10').AsString();
     
     _cpucounter();
     ProcessTwinson := (_cpucounter.cpuAccountDW - cpuAccount);  // ns

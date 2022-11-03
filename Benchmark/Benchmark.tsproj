@@ -6,14 +6,14 @@
 				<Cpu CpuId="3"/>
 			</Settings>
 			<Tasks>
-				<Task Id="3" Priority="20" CycleTime="100000" AmsPort="350" AdtTasks="true">
+				<Task Id="3" Priority="20" CycleTime="10000" AmsPort="350" AdtTasks="true">
 					<Name>PlcTask</Name>
 				</Task>
 			</Tasks>
 		</System>
 		<Plc>
 			<Project GUID="{1187505C-F72E-4DFF-AE32-175AE96FDE48}" Name="Benchmark" PrjFilePath="Benchmark\Benchmark.plcproj" TmcFilePath="Benchmark\Benchmark.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="Benchmark\Benchmark.tmc" TmcHash="{9D15DB6C-05BA-1B4C-79FC-3A095D3A7944}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="Benchmark\Benchmark.tmc" TmcHash="{C12B5314-C666-47FD-72F5-B8EBCE165837}">
 					<Name>Benchmark Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Contexts>
@@ -24,7 +24,7 @@
 								<OTCID>#x02010030</OTCID>
 							</ManualConfig>
 							<Priority>20</Priority>
-							<CycleTime>10000000</CycleTime>
+							<CycleTime>1000000</CycleTime>
 						</Context>
 					</Contexts>
 					<TaskPouOids>
