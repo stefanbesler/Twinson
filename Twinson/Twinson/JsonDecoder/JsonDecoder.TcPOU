@@ -171,11 +171,11 @@ _nodeCount := _nodeCount + 1;
     </Method>
     <Method Name="Decode" Id="{9e0a559b-3090-4700-8907-be0f1642151e}">
       <Declaration><![CDATA[METHOD Decode
-VAR_INPUT
-  json : POINTER TO BYTE;
+VAR_IN_OUT CONSTANT
+  json : STRING;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_jsonPtr := json;
+        <ST><![CDATA[_jsonPtr := ADR(json);
 _elementCount := 0;
 _nodeCount := 0;
 
@@ -201,15 +201,6 @@ DO
   
   _jsonPtr := _jsonPtr + 1;
 END_WHILE]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="DecodeString" Id="{bd0f2002-7d0a-4d67-a5d7-f7acec12df17}">
-      <Declaration><![CDATA[METHOD DecodeString
-VAR_IN_OUT CONSTANT
-  json : STRING;
-END_VAR]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[Decode(ADR(json));]]></ST>
       </Implementation>
     </Method>
     <Method Name="Element" Id="{4a76f022-7ad8-455a-86cd-e4ff5a774583}">

@@ -582,7 +582,7 @@ OF
 *)  
   
     _cpucounter(cpuAccountDW => cpuAccount);  
-  	_jsonTwinson.DecodeString(_example0);
+  	_jsonTwinson.Decode(_example0);
 	
     string1 := _jsonTwinson.Element('string1').AsString();
     string2 := _jsonTwinson.Element('string2').AsString();
@@ -597,7 +597,7 @@ OF
                                  "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }';
 *)   
     _cpucounter(cpuAccountDW => cpuAccount);  
-  	_jsonTwinson.DecodeString(_example1);
+  	_jsonTwinson.Decode(_example1);
 	
     string1 := _jsonTwinson.Element('string1').AsString();
     string2 := _jsonTwinson.Element('string2').AsString();
@@ -620,7 +620,7 @@ OF
                                  "array3": ["string1","string2","string3","string4","string5","string6","string7","string8","string9","string10"] }';
 *)   
     _cpucounter(cpuAccountDW => cpuAccount);  
-  	_jsonTwinson.DecodeString(_example2);
+  	_jsonTwinson.Decode(_example2);
 	
     string1 := _jsonTwinson.Element('array1[0]').AsString();
     string2 := _jsonTwinson.Element('array1[1]').AsString();
@@ -681,7 +681,7 @@ OF
 *)    
   
     _cpucounter(cpuAccountDW => cpuAccount);  
-  	_jsonTwinson.DecodeString(_example3);
+  	_jsonTwinson.Decode(_example3);
 	
     string1 := _jsonTwinson.Element('array1[0].string1').AsString();
     string2 := _jsonTwinson.Element('array1[0].string2').AsString();

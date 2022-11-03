@@ -16,7 +16,7 @@ VAR
   element2 : IJsonElement;  
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[DecodeString('[[[4,2,3]]]');
+        <ST><![CDATA[Decode('[[[4,2,3]]]');
 element0 := Element('array[0][0][0]');
 element1 := Element('array[0][0][1]');
 element2 := Element('array[0][0][2]');
