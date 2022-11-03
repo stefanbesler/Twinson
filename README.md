@@ -18,11 +18,10 @@ Simple and lightweight JSON decoder for TwinCAT and CODESYS.
 
 ## Comparison to Tc3_Json
 
-Twinson is lightweight alternative to Beckhoff's `Tc3_Json.FB_JsonDomParser`. When comparing Twinson with the Tc3_Json (TC 3.1.4024.25), is discovered some issues with Tc3_Json that might be addressed by Beckhoff in the future.
+Twinson is lightweight alternative to Beckhoff's `Tc3_Json.FB_JsonDomParser`. When comparing Twinson with the Tc3_Json (TC 3.1.4024.25), I discovered issues with Tc3_Json that might be addressed by Beckhoff in the future.
 
-- Null is not parsed correctly
-- Parsing nested arrays doesn't seem to work correctly
-- Array access and even member access is cumbersome (maybe it's only personal taste though)
+- `null`, as specified by the JSON format, is not parsed correctly.
+- Parsing nested arrays is cumbersome, because there is no way (at least I didn't find any documented) to access an array element directly.
 
 ## Benchmark
 
