@@ -14,7 +14,7 @@ Simple and lightweight JSON decoder for TwinCAT and CODESYS.
 - [x] Basic element access
 - [ ] Monadic element access
 - [ ] Unittests
-- [ ] Performance improvments for accessing elements, use tree to store date instead of array
+- [x] Performance improvements for accessing elements, use tree to store data instead of array
 
 ## Comparison to Tc3_Json
 
@@ -26,9 +26,6 @@ Twinson is lightweight alternative to Beckhoff's `Tc3_Json.FB_JsonDomParser`. Wh
 
 ## Benchmark
 
-Twinson includes a seperate PLC for benchmarking the library against Tc3_Json. The benchmark uses several examples with increasing JSON complexity. We measure the duration it takes for parsing a JSON document and assigning all members of the JSON document to TwinCAT variables with direct member access. Note that JsonDomParser offers an iterator-like approach for parsing, which may lead to better results.
-
-
-- Example 1
+Twinson includes a seperate PLC for benchmarking the library against Tc3_Json. The benchmark uses several examples with increasing JSON complexity. We measure the duration it takes for parsing a JSON document and assigning all members of the JSON document to TwinCAT variables with direct element access.
 
 
