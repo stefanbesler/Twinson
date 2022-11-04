@@ -31,11 +31,10 @@ VAR_INPUT
   node : POINTER TO JsonNode;
   readPtr : POINTER TO BYTE;
 END_VAR
-VAR
+VAR // TEMP
   writePtr : POINTER TO BYTE;
-  child : POINTER TO JsonNode;
-END_VAR
-]]></Declaration>
+  child : POINTER TO JsonNode;  
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// get next key, for part1.part2.part3, part1 is yieled
 writePtr := ADR(_key);
@@ -47,17 +46,17 @@ DO
 END_WHILE
 writePtr^ := 0;
 
-IF readPtr^ <> 0 AND_THEN readPtr^ = 16#5D  // skip ]
+IF readPtr^ = 16#5D  // skip ]
 THEN 
   readPtr := readPtr + 1; 
 END_IF
 
-IF readPtr^ <> 0 AND_THEN readPtr^ = 16#2E // skip .  
+IF readPtr^ = 16#2E // skip .  
 THEN 
   readPtr := readPtr + 1;
 END_IF  
 
-IF readPtr^ <> 0 AND_THEN readPtr^ = 16#5B  // skip [  
+IF readPtr^ = 16#5B  // skip [  
 THEN 
   readPtr := readPtr + 1;  
 END_IF 
@@ -65,27 +64,23 @@ END_IF
 // search for child with current key, if a match is found
 // check if we are at the end of the path and return the potential value,
 // otherwise recurse to next level
-child := node^.FirstChild;
-WHILE child <= node^.LastChild
+child := node^.Child;
+WHILE child <> 0
 DO
   IF child^.Name = _key
   THEN
-    IF child^.FirstChild <> 0 AND_THEN child^.FirstChild^.IsArray // we are dealing with an array
+  
+    IF readPtr^ <> 0
     THEN
-      _Element := THIS^._Element(child^.FirstChild, readPtr);
-    ELSIF readPtr^ <> 0
-    THEN
-      _Element := THIS^._Element(child, readPtr);    
-    ELSIF NOT child^.IsArray AND_THEN child^.Element <> 0 // direct access, exact match
+      _Element := THIS^._Element(child, readPtr);
+      RETURN;    
+    ELSIF child^.Element <> 0 // direct access, exact match
     THEN
       _Element := child^.Element^;
+      RETURN;
     END_IF
 	END_IF
   
-  IF _Element <> 0
-  THEN
-    RETURN;
-	END_IF
   child := child^.Next;
 END_WHILE]]></ST>
       </Implementation>
@@ -130,13 +125,12 @@ VAR
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[AddNode := ADR(_nodes) + SIZEOF(JsonNode) * _nodeCount;
-IF node^.LastChild <> 0
+IF node^.Child <> 0
 THEN
-  node^.LastChild^.Next := AddNode;
-  node^.LastChild := AddNode;
+  AddNode^.Next := node^.Child;
+  node^.Child := AddNode;
 ELSE
-  node^.FirstChild := AddNode;
-  node^.LastChild := AddNode;
+  node^.Child := AddNode;
 END_IF
 
 // set node name
@@ -150,9 +144,7 @@ DO
 END_WHILE
 namePtr^ := 0;
 // reset elements
-AddNode^.IsArray := FALSE;
-AddNode^.FirstChild := 0;
-AddNode^.LastChild := 0;
+AddNode^.Child := 0;
 _nodeCount := _nodeCount + 1;
   
 ]]></ST>
@@ -181,9 +173,9 @@ DO
   ELSIF _el = JsonElementType.Arry
   THEN
     _memPtr := _jsonPtr;
-    _root.FirstChild := AddNode(ADR(_root));
-    _root.FirstChild^.Name := 'array';
-    ParseArray(_root.FirstChild);
+    _root.Child := AddNode(ADR(_root));
+    _root.Child^.Name := 'array';
+    ParseArray(_root.Child);
   ELSE
     Abort('Unexpected character');    
   END_IF  
@@ -247,9 +239,15 @@ END_VAR]]></Declaration>
         <ST><![CDATA[writePtr := ADR(str);
 reversePtr := ADR(str);
 
+IF element < 10
+THEN
+  writePtr^ := 16#30 + INT_TO_BYTE(element);
+  writePtr[1] := 0;
+  RETURN;
+END_IF
+
 // we have to write the index in reverse, for element 12, we first build a string
 // that looks like 21 and then we reverse it
-// todo: test if a seperate branch for element < 10 is faster than doing the generic algorithm for this edge case as well
 REPEAT
   writePtr^ := INT_TO_BYTE(element MOD 10) + 16#30; writePtr := writePtr + 1;
   element := element / 10; 
@@ -281,8 +279,7 @@ VAR
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[node^.IsArray := TRUE;
-_jsonPtr := _jsonPtr + 1;
+        <ST><![CDATA[_jsonPtr := _jsonPtr + 1;
 
 REPEAT
 
@@ -337,20 +334,10 @@ OF
     AddElement(node);
     
   JsonElementType.Object:
-    // add . to the key and continue with the next object
-    //_pathPtr^ := 16#2E;
-    //_pathPtr := _pathPtr + 1;
     ParseObject(node);
   
-    // remove . from the key
-    //_pathPtr^ := 0;
-    //_pathPtr := _pathPtr - 1;
-  
   JsonElementType.Arry:
-  
-    child := AddNode(node);
-    child^.Name := '';
-    ParseArray(child);
+    ParseArray(node);
     
   JsonElementType.Boolean:
     _memPtr := _jsonPtr;

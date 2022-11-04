@@ -5,10 +5,8 @@
 STRUCT
   Name : STRING;
   Next : POINTER TO JsonNode;
-  FirstChild : POINTER TO JsonNode;
-  LastChild : POINTER TO JsonNode;
+  Child : POINTER TO JsonNode;
   Element : POINTER TO JsonElement;
-  IsArray : BOOL;
 END_STRUCT
 END_TYPE
 ]]></Declaration>
