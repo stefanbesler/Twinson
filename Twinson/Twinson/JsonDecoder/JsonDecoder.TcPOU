@@ -10,11 +10,11 @@ VAR
   _memPtr : POINTER TO BYTE;
   
   _elements : ARRAY[0..ParameterList.MaxJsonAssignments] OF JsonElement;
-  _elementCount : INT;  
+  _elementCount : UINT;  
   
   _root : JsonNode;
   _nodes : ARRAY[0..ParameterList.MaxJsonAssignments] OF JsonNode;
-  _nodeCount : INT;
+  _nodeCount : UINT;
   
   _el : JsonElementType;
 END_VAR
@@ -28,68 +28,57 @@ END_VAR]]></Declaration>
     <Method Name="_Element" Id="{01b90b91-98df-458d-95e0-7ae03947dbdb}">
       <Declaration><![CDATA[METHOD PROTECTED _Element : IJsonElement
 VAR_INPUT
-  node : REFERENCE TO JsonNode;
-END_VAR
-VAR_IN_OUT CONSTANT
-  path : STRING;
-END_VAR
-VAR_INPUT
-  readLen : UINT;  
+  node : POINTER TO JsonNode;
+  readPtr : POINTER TO BYTE;
 END_VAR
 VAR
   writePtr : POINTER TO BYTE;
-  readPtr : POINTER TO BYTE;
-  child : REFERENCE TO JsonNode;
+  child : POINTER TO JsonNode;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// get next key, for part1.part2.part3, part1 is yieled
-readPtr := ADR(path) + readLen;
 writePtr := ADR(_key);
 WHILE readPtr^ <> 16#0 AND_THEN readPtr^ <> 16#2E AND_THEN readPtr^ <> 16#5B AND_THEN readPtr^ <> 16#5D // eof, . or [
 DO
   writePtr^ := readPtr^;
   writePtr := writePtr + 1;
   readPtr := readPtr + 1;
-  readLen := readLen + 1;
 END_WHILE
 writePtr^ := 0;
 
 IF readPtr^ <> 0 AND_THEN readPtr^ = 16#5D  // skip ]
 THEN 
-  readLen := readLen + 1;
   readPtr := readPtr + 1; 
 END_IF
 
 IF readPtr^ <> 0 AND_THEN readPtr^ = 16#2E // skip .  
 THEN 
-  readLen := readLen + 1; 
   readPtr := readPtr + 1;
 END_IF  
 
 IF readPtr^ <> 0 AND_THEN readPtr^ = 16#5B  // skip [  
 THEN 
-  readLen := readLen + 1;
   readPtr := readPtr + 1;  
 END_IF 
 
 // search for child with current key, if a match is found
 // check if we are at the end of the path and return the potential value,
 // otherwise recurse to next level
-child REF= node.FirstChild;
-WHILE ADR(child) <= ADR(node.LastChild)
+child := node^.FirstChild;
+WHILE child <= node^.LastChild
 DO
-  IF child.Name = _key
+  IF child^.Name = _key
   THEN
-    IF __ISVALIDREF(child.FirstChild) AND_THEN child.FirstChild.IsArray // we are dealing with an array
+    IF child^.FirstChild <> 0 AND_THEN child^.FirstChild^.IsArray // we are dealing with an array
     THEN
-      _Element := THIS^._Element(child.FirstChild, path, readLen);
+      _Element := THIS^._Element(child^.FirstChild, readPtr);
     ELSIF readPtr^ <> 0
     THEN
-      _Element := THIS^._Element(child, path, readLen);    
-    ELSIF NOT child.IsArray AND_THEN __ISVALIDREF(child.Element) // direct access, exact match
+      _Element := THIS^._Element(child, readPtr);    
+    ELSIF NOT child^.IsArray AND_THEN child^.Element <> 0 // direct access, exact match
     THEN
-      _Element := child.Element;
+      _Element := child^.Element^;
     END_IF
 	END_IF
   
@@ -97,7 +86,7 @@ DO
   THEN
     RETURN;
 	END_IF
-  child REF= child.Next;
+  child := child^.Next;
 END_WHILE]]></ST>
       </Implementation>
     </Method>
@@ -115,43 +104,43 @@ THIS^.Error := TRUE;]]></ST>
     <Method Name="AddElement" Id="{b4920f3e-12a7-4d6b-b494-42db676d6673}">
       <Declaration><![CDATA[METHOD PROTECTED AddElement
 VAR_INPUT
-  node : REFERENCE TO JsonNode;
+  node : POINTER TO JsonNode;
 END_VAR
 VAR
-  element : REFERENCE TO JsonElement;
+  element : POINTER TO JsonElement;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[element REF= _elements[_elementCount];
-element.ValueType := _el;
-element.StartPtr := _memPtr;
-element.EndPtr := _jsonPtr;
+        <ST><![CDATA[element := ADR(_elements) + SIZEOF(JsonElement) * _elementCount;
+element^.ValueType := _el;
+element^.StartPtr := _memPtr;
+element^.EndPtr := _jsonPtr;
 _elementCount := _elementCount + 1;
 
-node.Element REF= element;]]></ST>
+node^.Element := element;]]></ST>
       </Implementation>
     </Method>
     <Method Name="AddNode" Id="{489314ba-53d4-43bd-a926-ca72da578204}">
-      <Declaration><![CDATA[METHOD PROTECTED AddNode : REFERENCE TO JsonNode
+      <Declaration><![CDATA[METHOD PROTECTED AddNode : POINTER TO JsonNode
 VAR_INPUT
-  node : REFERENCE TO JsonNode;
+  node : POINTER TO JsonNode;
 END_VAR
 VAR
   namePtr : POINTER TO BYTE;
   memPtr : POINTER TO BYTE;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[AddNode REF= _nodes[_nodeCount];
-IF __ISVALIDREF(node.LastChild)
+        <ST><![CDATA[AddNode := ADR(_nodes) + SIZEOF(JsonNode) * _nodeCount;
+IF node^.LastChild <> 0
 THEN
-  node.LastChild.Next REF= AddNode;
-  node.LastChild REF= AddNode;
+  node^.LastChild^.Next := AddNode;
+  node^.LastChild := AddNode;
 ELSE
-  node.FirstChild REF= AddNode;
-  node.LastChild REF= AddNode;
+  node^.FirstChild := AddNode;
+  node^.LastChild := AddNode;
 END_IF
 
 // set node name
-namePtr := ADR(AddNode.Name);
+namePtr := ADR(AddNode^.Name);
 memPtr := _memPtr;
 WHILE memPtr <> _jsonPtr
 DO
@@ -161,9 +150,9 @@ DO
 END_WHILE
 namePtr^ := 0;
 // reset elements
-AddNode.IsArray := FALSE;
-AddNode.FirstChild REF= 0;
-AddNode.LastChild REF= 0;
+AddNode^.IsArray := FALSE;
+AddNode^.FirstChild := 0;
+AddNode^.LastChild := 0;
 _nodeCount := _nodeCount + 1;
   
 ]]></ST>
@@ -188,12 +177,12 @@ DO
   _el := GuessElementType();
   IF _el = JsonElementType.Object
   THEN 
-    ParseObject(_root);
+    ParseObject(ADR(_root));
   ELSIF _el = JsonElementType.Arry
   THEN
     _memPtr := _jsonPtr;
-    _root.FirstChild REF= AddNode(_root);
-    _root.FirstChild.Name := 'array';
+    _root.FirstChild := AddNode(ADR(_root));
+    _root.FirstChild^.Name := 'array';
     ParseArray(_root.FirstChild);
   ELSE
     Abort('Unexpected character');    
@@ -209,7 +198,7 @@ VAR_IN_OUT CONSTANT
   path : STRING;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[Element := _Element(_root, path, 0);]]></ST>
+        <ST><![CDATA[Element := _Element(ADR(_root), ADR(path));]]></ST>
       </Implementation>
     </Method>
     <Method Name="GuessElementType" Id="{34940981-ada5-4521-bbcd-34f0ecb406f1}">
@@ -284,21 +273,21 @@ END_WHILE]]></ST>
     <Method Name="ParseArray" Id="{31f9e53c-038a-44b5-a16c-e5766a0048e5}">
       <Declaration><![CDATA[METHOD PROTECTED ParseArray
 VAR_INPUT
-  node : REFERENCE TO JsonNode;
+  node : POINTER TO JsonNode;
 END_VAR
 VAR
-  child : REFERENCE TO JsonNode;
+  child : POINTER TO JsonNode;
   elements : INT;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[node.IsArray := TRUE;
+        <ST><![CDATA[node^.IsArray := TRUE;
 _jsonPtr := _jsonPtr + 1;
 
 REPEAT
 
-  child REF= AddNode(node);
-  IntToString(elements, child.Name);
+  child := AddNode(node);
+  IntToString(elements, child^.Name);
   elements := elements + 1;
   ParseElement(child);
   
@@ -321,10 +310,10 @@ END_IF]]></ST>
     <Method Name="ParseElement" Id="{78f23aa0-bb02-4013-930a-f14a7bc442cb}">
       <Declaration><![CDATA[METHOD PROTECTED ParseElement
 VAR_INPUT
-  node : REFERENCE TO JsonNode;  
+  node : POINTER TO JsonNode;  
 END_VAR
 VAR
-  child : REFERENCE TO JsonNode;
+  child : POINTER TO JsonNode;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -358,8 +347,8 @@ OF
   
   JsonElementType.Arry:
   
-    child REF= AddNode(node);
-    child.Name := '';
+    child := AddNode(node);
+    child^.Name := '';
     ParseArray(child);
     
   JsonElementType.Boolean:
@@ -383,10 +372,10 @@ SkipWhitespaces();
     <Method Name="ParseObject" Id="{d3f57aad-1f9b-4dd9-890f-af9c01be5099}">
       <Declaration><![CDATA[METHOD PROTECTED ParseObject
 VAR_INPUT
-  node : REFERENCE TO JsonNode;  
+  node : POINTER TO JsonNode;  
 END_VAR
 VAR
-  child : REFERENCE TO JsonNode;
+  child : POINTER TO JsonNode;
   childNamePtr : POINTER TO BYTE;
 END_VAR]]></Declaration>
       <Implementation>
@@ -409,7 +398,7 @@ REPEAT
   SkipString();
   
   // chain key
-  child REF= AddNode(node);
+  child := AddNode(node);
     
   // skip " and additional whitespaces
   _jsonPtr := _jsonPtr + 1;
