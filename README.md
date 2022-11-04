@@ -35,7 +35,7 @@ Twinson includes a seperate PLC for benchmarking the library against Tc3_Json. T
 - Example 4: Object with 3 arrays, each containing 3 objects and each object has 10 key/value pairs
 
 <div align="center">
-  <img alt="benchmark" src="https://raw.githubusercontent.com/stefanbesler/Twinson/main/benchmark.png" />
+  <img alt="benchmark" src="https://raw.githubusercontent.com/stefanbesler/Twinson/main/benchmark_1.png" />
 </div>
 
 
