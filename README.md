@@ -15,6 +15,8 @@ Simple and lightweight JSON decoder for TwinCAT and CODESYS.
 - [ ] Monadic element access
 - [ ] Unittests
 - [x] Performance improvements for accessing elements, use tree to store data instead of array
+- [ ] Permormance tuning
+- [ ] Node access for "cached" element access
 
 ## Comparison to Tc3_Json
 
