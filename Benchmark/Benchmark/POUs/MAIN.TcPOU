@@ -82,6 +82,11 @@ OF
     ELSE
       _step := 2;
     END_IF
+    
+    IF _twinsonStatistic[_it].Size > 5000
+    THEN
+      _step := 4;
+		END_IF
 END_CASE]]></ST>
     </Implementation>
     <Method Name="ProcessTc3JsonDomParser" Id="{61bb2e29-ceba-403c-897f-286b751c77b7}">
