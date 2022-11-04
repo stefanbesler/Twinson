@@ -15,7 +15,7 @@ Simple and lightweight JSON decoder for TwinCAT and CODESYS.
 - [ ] Monadic element access
 - [ ] Unittests
 - [x] Performance improvements for accessing elements, use tree to store data instead of array
-- [ ] Permormance tuning
+- [x] Performance tuning
 - [ ] Node access for "cached" element access
 
 ## Comparison to Tc3_Json
@@ -33,9 +33,10 @@ Twinson includes a seperate PLC for benchmarking the library against Tc3_Json. T
 - Example 2: Object with 10 key/value pairs
 - Example 3: Object with 3 arrays, each containing 10 strings
 - Example 4: Object with 3 arrays, each containing 3 objects and each object has 10 key/value pairs
+- Example 5: Nested object with 10 levels hobject1.object2.(...).object9.string1)
 
 <div align="center">
-  <img alt="benchmark" src="https://raw.githubusercontent.com/stefanbesler/Twinson/main/benchmark_1.png" />
+  <img alt="benchmark" src="https://raw.githubusercontent.com/stefanbesler/Twinson/main/benchmark_2.png" />
 </div>
 
 

@@ -4,7 +4,7 @@
     <Declaration><![CDATA[PROGRAM MAIN
 VAR CONSTANT
   RepetionCount : DINT := 100;  
-  ExamplesCount : INT := 3;
+  ExamplesCount : INT := 4;
 END_VAR
 VAR
   _example0 : STRING(1023) := '{ "string1":"string1","string2":"string2","string3":"string3"}';  
@@ -35,6 +35,8 @@ VAR
                                             { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
                                               "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }]}';  
 
+  _example4 : STRING(3000) := '{ "object1": { "object2": { "object3": { "object4" : { "object5": { "object6": { "object7" : { "object8": { "object9" : { "string1" : "string1" } }}}} } } }}}';
+
   _jsonTwinson : Twinson.JsonDecoder;
   _jsonTc3 : Tc3_JsonXml.FB_JsonDomParser;
   _jsonTc3Document : Tc3_JsonXml.SJsonValue;
@@ -42,7 +44,7 @@ VAR
   _step : INT := 0;
   _dt, _it, _jt : DINT := 0;
   
-  _twinsonStatistic, _tc3JsonDomParserStatistic : ARRAY[0..3] OF MovingStatistic; 
+  _twinsonStatistic, _tc3JsonDomParserStatistic : ARRAY[0..ExamplesCount] OF MovingStatistic; 
   _cpucounter : Tc2_System.GETCPUACCOUNT;
 END_VAR]]></Declaration>
     <Implementation>
@@ -553,6 +555,19 @@ OF
     
     _cpucounter();
     ProcessTc3JsonDomParser := (_cpucounter.cpuAccountDW - cpuAccount);  // ns
+
+  4:    
+(*
+  { "object1": { "object2": { "object3": { "object4" : { "object5": { "object6": { "object7" : { "object8": { "object9" : { "string1" : "string1" } }}}} } } }}}
+*)
+    _cpucounter(cpuAccountDW => cpuAccount);  
+    _jsonTc3Document := _jsonTc3.ParseDocument(_example4);
+    
+    string1 := _jsonTc3.GetString(_jsonTc3.FindMemberPath(_jsonTc3Document, 'object1/object2/object3/object4/object5/object6/object7/object8/object9/string1'));
+    
+   _cpucounter();
+    ProcessTc3JsonDomParser := (_cpucounter.cpuAccountDW - cpuAccount);  // ns  
+    
 END_CASE
 
 ]]></ST>
@@ -791,6 +806,19 @@ OF
     
     _cpucounter();
     ProcessTwinson := (_cpucounter.cpuAccountDW - cpuAccount);  // ns
+    
+    
+  4:
+(*
+  { "object1": { "object2": { "object3": { "object4" : { "object5": { "object6": { "object7" : { "object8": { "object9" : { "string1" : "string1" } }}}} } } }}}
+*)
+    _cpucounter(cpuAccountDW => cpuAccount);  
+    _jsonTwinson.Decode(_example4);
+    
+    string1 := _jsonTwinson.Element('object1.object2.object3.object4.object5.object6.object7.object8.object9.string1').AsString();
+    
+    _cpucounter();
+    ProcessTwinson := (_cpucounter.cpuAccountDW - cpuAccount);  // ns    
 END_CASE
 ]]></ST>
       </Implementation>
