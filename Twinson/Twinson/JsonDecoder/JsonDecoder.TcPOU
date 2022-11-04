@@ -286,6 +286,7 @@ _jsonPtr := _jsonPtr + 1;
 
 REPEAT
 
+  _memPtr := _jsonPtr; // we set the name by index later on
   child := AddNode(node);
   IntToString(elements, child^.Name);
   elements := elements + 1;

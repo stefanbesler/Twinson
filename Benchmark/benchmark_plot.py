@@ -5,8 +5,8 @@ import numpy as np
 
 
 ticks = ('Example 1', 'Example 2', 'Example 3', 'Example 4')
-twinson_average_mean = [2.2, 4.7, 11.4, 41.6]
-domparser_average_mean = [4.2, 7.0, 12.0, 42.1]
+twinson_average_mean = [2.2, 4.7, 11.4, 42.8]
+domparser_average_mean = [4.2, 7.3, 12.9, 45.0]
 twinson_average_err = [1.4, 2.4, 5.5, 17.2]
 domparser_average_err = [2.5, 3.5, 9.4, 17.0]
 
