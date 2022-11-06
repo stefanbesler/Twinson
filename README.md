@@ -33,7 +33,7 @@ Twinson includes a seperate PLC for benchmarking the library against Tc3_Json. T
 - Example 2: Object with 10 key/value pairs
 - Example 3: Object with 3 arrays, each containing 10 strings
 - Example 4: Object with 3 arrays, each containing 3 objects and each object has 10 key/value pairs
-- Example 5: Nested object with 10 levels hobject1.object2.(...).object9.string1)
+- Example 5: Nested object with 10 levels object1.object2.(...).object9.string1...string10)
 
 <div align="center">
   <img alt="benchmark" src="https://raw.githubusercontent.com/stefanbesler/Twinson/main/benchmark_2.png" />

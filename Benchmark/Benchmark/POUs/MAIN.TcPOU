@@ -35,7 +35,8 @@ VAR
                                             { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
                                               "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" }]}';  
 
-  _example4 : STRING(3000) := '{ "object1": { "object2": { "object3": { "object4" : { "object5": { "object6": { "object7" : { "object8": { "object9" : { "string1" : "string1" } }}}} } } }}}';
+  _example4 : STRING(3000) := '{ "object1": { "object2": { "object3": { "object4" : { "object5": { "object6": { "object7" : { "object8": { "object9" : { "string1":"string1","string2":"string2","string3":"string3","string4":"string4","string5":"string5",
+                                 "string6":"string6","string7":"string7","string8":"string8","string9":"string9","string10":"string10" } }}}} } } }}}';
 
   _jsonTwinson : Twinson.JsonDecoder;
   _jsonTc3 : Tc3_JsonXml.FB_JsonDomParser;
@@ -558,12 +559,21 @@ OF
 
   4:    
 (*
-  { "object1": { "object2": { "object3": { "object4" : { "object5": { "object6": { "object7" : { "object8": { "object9" : { "string1" : "string1" } }}}} } } }}}
+  { "object1": { "object2": { "object3": { "object4" : { "object5": { "object6": { "object7" : { "object8": { "object9" : { "string1" : "string1" ... } }}}} } } }}}
 *)
     _cpucounter(cpuAccountDW => cpuAccount);  
     _jsonTc3Document := _jsonTc3.ParseDocument(_example4);
     
     string1 := _jsonTc3.GetString(_jsonTc3.FindMemberPath(_jsonTc3Document, 'object1/object2/object3/object4/object5/object6/object7/object8/object9/string1'));
+    string2 := _jsonTc3.GetString(_jsonTc3.FindMemberPath(_jsonTc3Document, 'object1/object2/object3/object4/object5/object6/object7/object8/object9/string2'));
+    string3 := _jsonTc3.GetString(_jsonTc3.FindMemberPath(_jsonTc3Document, 'object1/object2/object3/object4/object5/object6/object7/object8/object9/string3'));
+    string4 := _jsonTc3.GetString(_jsonTc3.FindMemberPath(_jsonTc3Document, 'object1/object2/object3/object4/object5/object6/object7/object8/object9/string4'));
+    string5 := _jsonTc3.GetString(_jsonTc3.FindMemberPath(_jsonTc3Document, 'object1/object2/object3/object4/object5/object6/object7/object8/object9/string5'));
+    string6 := _jsonTc3.GetString(_jsonTc3.FindMemberPath(_jsonTc3Document, 'object1/object2/object3/object4/object5/object6/object7/object8/object9/string6'));
+    string7 := _jsonTc3.GetString(_jsonTc3.FindMemberPath(_jsonTc3Document, 'object1/object2/object3/object4/object5/object6/object7/object8/object9/string7'));
+    string8 := _jsonTc3.GetString(_jsonTc3.FindMemberPath(_jsonTc3Document, 'object1/object2/object3/object4/object5/object6/object7/object8/object9/string8'));
+    string9 := _jsonTc3.GetString(_jsonTc3.FindMemberPath(_jsonTc3Document, 'object1/object2/object3/object4/object5/object6/object7/object8/object9/string9'));
+    string10 := _jsonTc3.GetString(_jsonTc3.FindMemberPath(_jsonTc3Document, 'object1/object2/object3/object4/object5/object6/object7/object8/object9/string10'));
     
    _cpucounter();
     ProcessTc3JsonDomParser := (_cpucounter.cpuAccountDW - cpuAccount);  // ns  
@@ -810,12 +820,21 @@ OF
     
   4:
 (*
-  { "object1": { "object2": { "object3": { "object4" : { "object5": { "object6": { "object7" : { "object8": { "object9" : { "string1" : "string1" } }}}} } } }}}
+  { "object1": { "object2": { "object3": { "object4" : { "object5": { "object6": { "object7" : { "object8": { "object9" : { "string1" : "string1" ... } }}}} } } }}}
 *)
     _cpucounter(cpuAccountDW => cpuAccount);  
     _jsonTwinson.Decode(_example4);
     
     string1 := _jsonTwinson.Element('object1.object2.object3.object4.object5.object6.object7.object8.object9.string1').AsString();
+    string2 := _jsonTwinson.Element('object1.object2.object3.object4.object5.object6.object7.object8.object9.string2').AsString();
+    string3 := _jsonTwinson.Element('object1.object2.object3.object4.object5.object6.object7.object8.object9.string3').AsString();
+    string4 := _jsonTwinson.Element('object1.object2.object3.object4.object5.object6.object7.object8.object9.string4').AsString();
+    string5 := _jsonTwinson.Element('object1.object2.object3.object4.object5.object6.object7.object8.object9.string5').AsString();
+    string6 := _jsonTwinson.Element('object1.object2.object3.object4.object5.object6.object7.object8.object9.string6').AsString();
+    string7 := _jsonTwinson.Element('object1.object2.object3.object4.object5.object6.object7.object8.object9.string7').AsString();
+    string8 := _jsonTwinson.Element('object1.object2.object3.object4.object5.object6.object7.object8.object9.string8').AsString();
+    string9 := _jsonTwinson.Element('object1.object2.object3.object4.object5.object6.object7.object8.object9.string9').AsString();
+    string10 := _jsonTwinson.Element('object1.object2.object3.object4.object5.object6.object7.object8.object9.string10').AsString();
     
     _cpucounter();
     ProcessTwinson := (_cpucounter.cpuAccountDW - cpuAccount);  // ns    

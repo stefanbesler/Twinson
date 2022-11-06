@@ -5,10 +5,10 @@ import numpy as np
 
 
 ticks = ('Example 1', 'Example 2', 'Example 3', 'Example 4', 'Example 5')
-twinson_average_mean = [2.5, 4.8, 10.5, 39.2, 3.0]
-twinson_average_err = [1, 1.8, 3.4, 12.1, 1.4]
-domparser_average_mean = [4.7, 7.3, 12.1, 42.2, 5.3]
-domparser_average_err = [1.7, 2.7, 3.9, 12.8, 2.5]
+twinson_average_mean = [2.5, 4.8, 10.5, 39.2, 8.8]
+twinson_average_err = [1, 1.8, 3.4, 12.1, 4]
+domparser_average_mean = [4.7, 7.3, 12.1, 42.2, 10.5]
+domparser_average_err = [1.7, 2.7, 3.9, 12.8, 4]
 
 y_pos = np.arange(len(ticks))
 y_pos1 = y_pos - 0.175
