@@ -166,19 +166,19 @@ WHILE _jsonPtr^ <> 0
 DO
   SkipWhitespaces();
 
-  _el := GuessElementType();
-  IF _el = JsonElementType.Object
-  THEN 
-    ParseObject(ADR(_root));
-  ELSIF _el = JsonElementType.Arry
-  THEN
-    _memPtr := _jsonPtr;
-    _root.Child := AddNode(ADR(_root));
-    _root.Child^.Name := 'array';
-    ParseArray(_root.Child);
+  CASE GuessElementType()
+  OF
+    JsonElementType.Object:
+      ParseObject(ADR(_root));
+    JsonElementType.Arry:
+      _memPtr := _jsonPtr;
+      _root.Child := AddNode(ADR(_root));
+      _root.Child^.Name := 'array';
+      ParseArray(_root.Child);
   ELSE
-    Abort('Unexpected character');    
-  END_IF  
+    Abort('Unexpected character');
+    RETURN;
+	END_CASE
   
   _jsonPtr := _jsonPtr + 1;
 END_WHILE]]></ST>
@@ -195,8 +195,6 @@ END_VAR]]></Declaration>
     </Method>
     <Method Name="GuessElementType" Id="{34940981-ada5-4521-bbcd-34f0ecb406f1}">
       <Declaration><![CDATA[METHOD PROTECTED GuessElementType : JsonElementType
-VAR_INPUT
-END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE _jsonPtr^
@@ -237,8 +235,8 @@ VAR
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[writePtr := ADR(str);
-reversePtr := ADR(str);
 
+// for ints below ten, conversion is easy
 IF element < 10
 THEN
   writePtr^ := 16#30 + INT_TO_BYTE(element);
@@ -246,8 +244,10 @@ THEN
   RETURN;
 END_IF
 
+// for more elements it gets trickier
 // we have to write the index in reverse, for element 12, we first build a string
-// that looks like 21 and then we reverse it
+// that looks like 21 and then we reverse it, because we apriori don't know how many
+// characters will come
 REPEAT
   writePtr^ := INT_TO_BYTE(element MOD 10) + 16#30; writePtr := writePtr + 1;
   element := element / 10; 
@@ -255,6 +255,7 @@ UNTIL element = 0 END_REPEAT
 writePtr^ := 0;
 
 // reverse string with XOR swap algorithm
+reversePtr := ADR(str);
 endPtr := writePtr - 1;
 WHILE reversePtr < endPtr
 DO
@@ -422,26 +423,23 @@ END_IF]]></ST>
       <Declaration><![CDATA[METHOD PROTECTED SkipBoolean
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_jsonPtr := _jsonPtr + 4; // true
-
-IF _jsonPtr^ = 16#66 // f
+        <ST><![CDATA[IF _jsonPtr^ = 16#66 // f
 THEN
   _jsonPtr := _jsonPtr + 1; // false
-END_IF]]></ST>
+END_IF
+
+_jsonPtr := _jsonPtr + 4; // true
+
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="SkipNumber" Id="{77969f1c-9894-42e4-81b6-8fc4acc31c50}">
       <Declaration><![CDATA[METHOD PROTECTED SkipNumber
-VAR
-  ch : BYTE;
-END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[ch := _jsonPtr^;
-WHILE (ch >= 16#30 AND_THEN ch <= 16#39) OR_ELSE ch = 16#2B OR_ELSE ch = 16#2D OR_ELSE ch = 16#2E OR_ELSE ch = 16#65 OR_ELSE ch = 16#45
+        <ST><![CDATA[WHILE (_jsonPtr^ >= 16#30 AND_THEN _jsonPtr^ <= 16#39) OR_ELSE _jsonPtr^ = 16#2B OR_ELSE _jsonPtr^ = 16#2D OR_ELSE _jsonPtr^ = 16#2E OR_ELSE _jsonPtr^ = 16#65 OR_ELSE _jsonPtr^ = 16#45
 DO
   _jsonPtr := _jsonPtr + 1;
-  ch := _jsonPtr^;
 END_WHILE ]]></ST>
       </Implementation>
     </Method>
@@ -456,16 +454,11 @@ END_WHILE]]></ST>
     </Method>
     <Method Name="SkipWhitespaces" Id="{eb42f950-84b2-4370-a0c4-aff9ce5ce2f4}">
       <Declaration><![CDATA[METHOD PROTECTED SkipWhitespaces
-VAR
-  ch : BYTE;
-END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[ch := _jsonPtr^;
-WHILE ch > 0 AND_THEN ch <= 16#20
+        <ST><![CDATA[WHILE _jsonPtr^ > 0 AND_THEN _jsonPtr^ <= 16#20
 DO
   _jsonPtr := _jsonPtr + 1;
-  ch := _jsonPtr^;
 END_WHILE]]></ST>
       </Implementation>
     </Method>
