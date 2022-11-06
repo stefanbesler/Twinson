@@ -4,9 +4,9 @@
     <Declaration><![CDATA[TYPE JsonNode :
 STRUCT
   Name : STRING;
-  Next : POINTER TO JsonNode;
-  Child : POINTER TO JsonNode;
-  Element : POINTER TO JsonElement;
+  Next : REFERENCE TO JsonNode;
+  Child : REFERENCE TO JsonNode;
+  Element : REFERENCE TO JsonElement;
 END_STRUCT
 END_TYPE
 ]]></Declaration>

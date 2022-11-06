@@ -5,9 +5,9 @@ import numpy as np
 
 
 ticks = ('Example 1', 'Example 2', 'Example 3', 'Example 4', 'Example 5')
-twinson_average_mean = [1.9, 4.0, 8.9, 33.7, 2.8]
+twinson_average_mean = [2.5, 4.8, 10.5, 39.2, 3.0]
 twinson_average_err = [1, 1.8, 3.4, 12.1, 1.4]
-domparser_average_mean = [3.4, 5.9, 10.3, 36.7, 4.7]
+domparser_average_mean = [4.7, 7.3, 12.1, 42.2, 5.3]
 domparser_average_err = [1.7, 2.7, 3.9, 12.8, 2.5]
 
 y_pos = np.arange(len(ticks))
